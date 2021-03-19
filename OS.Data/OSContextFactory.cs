@@ -13,7 +13,7 @@ namespace OS.Data
             public OSContext CreateDbContext(string[] args)
             {
                 var optionsBuilder = new DbContextOptionsBuilder<OSContext>();
-            //optionsBuilder.UseSqlite("Data Source=todos.db");
+            //optionsBuilder.UseMySql("Data Source=oversites");
 
             return new OSContext(optionsBuilder.Options);
             }
