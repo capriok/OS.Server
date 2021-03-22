@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.Core.Models
+namespace OS.API.Models
 {
-    public class User
+    public class PutUserScaffold
     {
         public int Id { get; set; }
-        public string Username{ get; set; }
-        public DateTime JoinDate{ get; set; }
+        public string Username { get; set; }
+        public string JoinDate { get; set; }
     }
 }

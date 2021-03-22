@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OS.Core.Models;
+using Microsoft.EntityFrameworkCore;
 using OS.Data.Interfaces;
 
 namespace OS.Core.Services
 {
-    class UserService : IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
 
@@ -16,28 +16,101 @@ namespace OS.Core.Services
             _userRepository = userRepository;
         }
 
-        public Task<List<User>> GetUsers()
+        public async Task<List<Models.User>> GetUsersAsync()
         {
-            throw new NotImplementedException();
+            IQueryable<Data.Entities.User> query = _userRepository.GetQueryable();
+
+            return await query.Select(user => new Models.User
+            {
+                Id = user.Id,
+                Username = user.Username,
+                JoinDate = user.JoinDate
+            })
+            .ToListAsync();
         }
-        public Task<User> GetUser(int Id)
+        public Data.Entities.User GetUserByUsernameAsync(string Username)
         {
-            throw new NotImplementedException();
+            var userEntity = _userRepository.FindByUsernameAsync(Username);
+
+            if (userEntity is null)
+            {
+                return null;
+            }
+
+            return userEntity;
         }
 
-        public Task<User> CreateUser(User user)
+        public async Task<Data.Entities.User> GetUserEntityAsync(int Id)
         {
-            throw new NotImplementedException();
+            var userEntity = await _userRepository.FindByIdAsync(Id);
+
+            if (userEntity is null)
+            {
+                return null;
+            }
+
+            return userEntity;
+
         }
 
-        public Task<User> UpdateUser(User user)
+        public async Task<Models.User> GetUserModelAsync(int Id)
         {
-            throw new NotImplementedException();
+            var userEntity = await _userRepository.FindByIdAsync(Id);
+
+            if (userEntity is null)
+            {
+                return null;
+            }
+
+            return new Models.User
+            {
+                Id = userEntity.Id,
+                Username = userEntity.Username,
+                JoinDate = userEntity.JoinDate
+            };
         }
 
-        public Task DeleteUser(int Id)
+        public async Task<Models.User> CreateUserAsync(Data.Entities.User user)
         {
-            throw new NotImplementedException();
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            string mySqlCurrentDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+            var userEntity = new Data.Entities.User
+            {
+                Username = user.Username,
+                Password = user.Password,
+                JoinDate = DateTime.Parse(mySqlCurrentDateTime)
+            };
+
+            userEntity = await _userRepository.AddAsync(userEntity);
+
+            return new Models.User
+            {
+                Id = userEntity.Id,
+                Username = userEntity.Username,
+                JoinDate = userEntity.JoinDate
+            };
+        }
+
+        public async Task<Models.User> UpdateUserAsync(Data.Entities.User user)
+        {
+            var userEntity = await _userRepository.UpdateAsync(user);
+
+            return new Models.User
+            {
+                Id = userEntity.Id,
+                Username = userEntity.Username,
+                JoinDate = userEntity.JoinDate
+            };
+        }
+
+        public async Task DeleteUserAsync(int Id)
+        {
+            await _userRepository.RemoveAsync(Id);
         }
     }
 }

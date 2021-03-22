@@ -4,41 +4,67 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OS.Data.Interfaces;
-using OS.Data.Entities;
+using OS.Data;
 
 namespace OS.Data.Repositories
 {
-    class UserRepository : IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly OSContext _OSContext;
-        public UserRepository (OSContext osContext)
+        public UserRepository(OSContext osContext)
         {
             _OSContext = osContext;
         }
 
-        public Task<User> Add(User user)
+        public IQueryable<Entities.User> GetQueryable()
         {
-            throw new NotImplementedException();
+            return _OSContext.Users.AsQueryable();
         }
 
-        public Task<User> Find(int id)
+        public async Task<Entities.User> FindByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _OSContext.Users.FindAsync(id);
         }
 
-        public IQueryable<User> Get()
+        public Entities.User FindByUsernameAsync(string username)
         {
-            throw new NotImplementedException();
+            return _OSContext.Users.AsQueryable()
+                .Where(u => u.Username.Equals(username))
+                .FirstOrDefault();
         }
 
-        public Task<User> Update(User user)
+        public async Task<Entities.User> AddAsync(Entities.User user)
         {
-            throw new NotImplementedException();
+            _OSContext.Users.Add(user);
+
+            await _OSContext.SaveChangesAsync();
+
+            return user;
         }
 
-        public Task Remove(int id)
+        public async Task<Entities.User> UpdateAsync(Entities.User user)
         {
-            throw new NotImplementedException();
+            var local = _OSContext.Users.Local.FirstOrDefault(entity => entity.Id == user.Id);
+            if (local is not null)
+            {
+                _OSContext.Entry(local).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+            }
+
+            _OSContext.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+            await _OSContext.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task RemoveAsync(int id)
+        {
+            var user = await _OSContext.Users.FindAsync(id);
+            if (user is not null)
+            {
+                _OSContext.Users.Remove(user);
+                await _OSContext.SaveChangesAsync();
+            }
         }
     }
 }

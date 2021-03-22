@@ -11,6 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using OS.Core.Services;
+using OS.Data.Interfaces;
+using OS.Data.Repositories;
 using OS.Data;
 
 namespace OS.API
@@ -27,7 +31,15 @@ namespace OS.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<OSContext>(opt => opt.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<OSContext>(
+                contextOptions => contextOptions.UseMySql(
+                    Configuration.GetConnectionString("DefaultConnection"),
+                    new MySqlServerVersion(new Version(8, 0, 23)),
+                    mySqlOptions => mySqlOptions
+                        .CharSetBehavior(CharSetBehavior.NeverAppend))
+                        .EnableSensitiveDataLogging()
+                        .EnableDetailedErrors()
+            );
 
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
@@ -36,6 +48,9 @@ namespace OS.API
                 .AllowAnyMethod()
                 .AllowAnyOrigin();
             }));
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddControllers();
         }
@@ -48,6 +63,8 @@ namespace OS.API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("MyPolicy");
+             
             app.UseHttpsRedirection();
 
             app.UseRouting();

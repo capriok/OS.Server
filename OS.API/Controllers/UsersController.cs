@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using OS.API.Models;
+using OS.Data.Interfaces;
 using OS.Data;
-using OS.Data.Entities;
-
 
 namespace OS.API.Controllers
 {
@@ -16,101 +15,103 @@ namespace OS.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly OSContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(OSContext context)
+        public UsersController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<Data.Entities.User>>> GetUsersAsync()
         {
-            IEnumerable<User> userList = await _context.Users.ToListAsync();
+            var userList = await _userService.GetUsersAsync();
 
             return Ok(userList);
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<Data.Entities.User>> GetUserAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            var userEntity = await _userService.GetUserModelAsync(id);
+            if (userEntity is null)
+            {
                 return NotFound();
+            }
 
-            return user;
+            return Ok(userEntity);
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<User>> PostUser(User user)
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<Data.Entities.User>> CreateUserAsync(NewUserScaffold newUserScaffold)
         {
-            //System.Diagnostics.Debug.WriteLine(user);
-
-            if (UserExistsByUsername(user.Username))
+            var userEntity = _userService.GetUserByUsernameAsync(newUserScaffold.Username);
+            if (userEntity is not null)
+            {
                 return Conflict();
+            }
 
-            DateTime JoinDate= DateTime.Now;
-            string SQLFormattedJoinDate = JoinDate.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            user.JoinDate = SQLFormattedJoinDate;
+            var userScaffold = new Data.Entities.User
+            {
+                Username = newUserScaffold.Username,
+                Password = newUserScaffold.Password
+            };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var createdUser = await _userService.CreateUserAsync(userScaffold);
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return Created(nameof(createdUser), new { id = createdUser.Id });
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> PutUser(int id, User user)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateUserAsync(int id, PutUserScaffold putUserScaffold)
         {
-            if (id != user.Id)
+            if (id != putUserScaffold.Id)
+            {
                 return BadRequest();
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+
+            var userEntity = await _userService.GetUserEntityAsync(id);
+            if (userEntity is null)
             {
-                if (!UserExistsById(id))
-                    return NotFound();
-                else
-                    throw;
+                return NotFound();
             }
+
+            var user = new Data.Entities.User
+            {
+                Id = id,
+                Username = putUserScaffold.Username,
+                Password = userEntity.Password,
+                JoinDate = DateTime.Parse(putUserScaffold.JoinDate),
+            };
+
+            await _userService.UpdateUserAsync(user);
 
             return NoContent();
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> DeleteUser(int id)
+        public async Task<ActionResult<Data.Entities.User>> DeleteUserAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var userEntity = await _userService.GetUserModelAsync(id);
+            if (userEntity is null)
+            {
                 return NotFound();
+            }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            await _userService.DeleteUserAsync(id);
 
-            return user;
-        }
-
-        private bool UserExistsById(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
-        private bool UserExistsByUsername(string username)
-        {
-            return _context.Users.Any(e => e.Username == username);
+            return NoContent();
         }
     }
 }

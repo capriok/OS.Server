@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OS.Data.Entities;
+using OS.Data;
 
 namespace OS.Data.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> Find(int id);
-        Task<User> Update(User user);
-        Task<User> Add(User user);
-        Task Remove(int id);
-        IQueryable<User> Get();
+        Task<Entities.User> FindByIdAsync(int id);
+        Entities.User FindByUsernameAsync(string Username);
+        Task<Entities.User> UpdateAsync(Entities.User user);
+        Task<Entities.User> AddAsync(Entities.User user);
+        Task RemoveAsync(int id);
+        IQueryable<Entities.User> GetQueryable();
     }
 }
