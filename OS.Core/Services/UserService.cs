@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using OS.Data.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using OS.Data.Interfaces;
 
 namespace OS.Core.Services
 {
@@ -30,7 +30,7 @@ namespace OS.Core.Services
         }
         public Data.Entities.User GetUserByUsernameAsync(string Username)
         {
-            var userEntity = _userRepository.FindByUsernameAsync(Username);
+            var userEntity = _userRepository.FindByUsername(Username);
 
             if (userEntity is null)
             {

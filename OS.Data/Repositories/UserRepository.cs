@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OS.Data.Interfaces;
-using OS.Data;
 
 namespace OS.Data.Repositories
 {
@@ -26,9 +25,9 @@ namespace OS.Data.Repositories
             return await _OSContext.Users.FindAsync(id);
         }
 
-        public Entities.User FindByUsernameAsync(string username)
+        public Entities.User FindByUsername(string username)
         {
-            return _OSContext.Users.AsQueryable()
+            return GetQueryable()
                 .Where(u => u.Username.Equals(username))
                 .FirstOrDefault();
         }
@@ -36,7 +35,6 @@ namespace OS.Data.Repositories
         public async Task<Entities.User> AddAsync(Entities.User user)
         {
             _OSContext.Users.Add(user);
-
             await _OSContext.SaveChangesAsync();
 
             return user;
@@ -51,7 +49,6 @@ namespace OS.Data.Repositories
             }
 
             _OSContext.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-
             await _OSContext.SaveChangesAsync();
 
             return user;

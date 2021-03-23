@@ -9,7 +9,7 @@ namespace OS.Data.Interfaces
     public interface IUserRepository
     {
         Task<Entities.User> FindByIdAsync(int id);
-        Entities.User FindByUsernameAsync(string Username);
+        Entities.User FindByUsername(string Username);
         Task<Entities.User> UpdateAsync(Entities.User user);
         Task<Entities.User> AddAsync(Entities.User user);
         Task RemoveAsync(int id);
