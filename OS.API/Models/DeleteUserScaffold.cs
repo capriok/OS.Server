@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace OS.API.Models
 {
-    public class PutUserScaffold
+    public class DeleteUserScaffold
     {
         public int Id { get; set; }
-        public string Username { get; set; }
     }
 }

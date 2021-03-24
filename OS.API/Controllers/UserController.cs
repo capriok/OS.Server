@@ -11,13 +11,13 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace OS.API.Controllers
 {
-    [Route("os/user")]
+    [Route("os/users")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
@@ -30,6 +30,19 @@ namespace OS.API.Controllers
             var userList = await _userService.GetUsersAsync();
 
             return Ok(userList);
+        }
+    }
+
+
+    [Route("os/user")]
+    [ApiController]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
         }
 
         [HttpGet("{id}")]
@@ -46,38 +59,14 @@ namespace OS.API.Controllers
             return Ok(userEntity);
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<Data.Entities.User>> CreateUserAsync(NewUserScaffold newUserScaffold)
-        {
-            var userEntity = _userService.GetUserByUsernameAsync(newUserScaffold.Username);
-            if (userEntity is not null)
-            {
-                return Conflict();
-            }
-
-            var userScaffold = new Data.Entities.User
-            {
-                Username = newUserScaffold.Username,
-                Password = newUserScaffold.Password
-            };
-
-            var createdUser = await _userService.CreateUserAsync(userScaffold);
-
-            return Created(nameof(createdUser), new { id = createdUser.Id });
-        }
-
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUserAsync(int id, PutUserScaffold putUserScaffold)
+        public async Task<IActionResult> UpdateUserAsync(int id, PutUserScaffold scaffold)
         {
-            if (id != putUserScaffold.Id)
+            if (id != scaffold.Id)
             {
                 return BadRequest();
             }
@@ -90,10 +79,10 @@ namespace OS.API.Controllers
 
             var user = new Data.Entities.User
             {
-                Id = id,
-                Username = putUserScaffold.Username,
+                Id = scaffold.Id,
+                Username = scaffold.Username,
                 Password = userEntity.Password,
-                JoinDate = DateTime.Parse(putUserScaffold.JoinDate),
+                JoinDate = userEntity.JoinDate,
             };
 
             await _userService.UpdateUserAsync(user);
@@ -103,17 +92,25 @@ namespace OS.API.Controllers
 
         [HttpDelete("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Data.Entities.User>> DeleteUserAsync(int id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DeleteUserAsync(int Id, DeleteUserScaffold scaffold)
         {
-            var userEntity = await _userService.GetUserModelAsync(id);
+            var userEntity = await _userService.GetUserModelAsync(Id);
+
             if (userEntity is null)
             {
                 return NotFound();
             }
 
-            await _userService.DeleteUserAsync(id);
+            if (userEntity.Id != scaffold.Id)
+            {
+                return BadRequest();
+            }
+
+
+            await _userService.DeleteUserAsync(Id);
 
             return NoContent();
         }

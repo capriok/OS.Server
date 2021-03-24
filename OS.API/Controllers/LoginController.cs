@@ -28,18 +28,21 @@ namespace OS.API.Controllers
             _userService = userService;
         }
 
-        [AllowAnonymous]
         [HttpPost]
-        public IActionResult Login([FromBody] LoginUserScaffold loginUser)
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult Login([FromBody] LoginUserScaffold scaffold)
         {
-            var userEntity = _userService.GetUserByUsernameAsync(loginUser.Username);
+            var userEntity = _userService.GetUserByUsernameAsync(scaffold.Username);
 
             if (userEntity is null)
             {
                 return Unauthorized();
             }
 
-            if (!userEntity.Password.Equals(loginUser.Password))
+            if (!userEntity.Password.Equals(scaffold.Password))
             {
                 return Conflict();
             }
@@ -51,12 +54,11 @@ namespace OS.API.Controllers
                 JoinDate = userEntity.JoinDate
             };
 
-            return Ok(new
-            {
-                token = GenerateJSONWebToken(user)
-            });
+            var token = new { token = GenerateJSONWebToken(user) };
+
+            return Ok(token);
         }
-      
+
         private string GenerateJSONWebToken(Core.Models.User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -73,7 +75,7 @@ namespace OS.API.Controllers
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Issuer"],
                 claims: tokenClaims,
-                expires: DateTime.Now.AddDays(7),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: credentials
             );
 
