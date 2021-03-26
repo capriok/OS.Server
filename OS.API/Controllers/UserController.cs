@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using OS.Data.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using OS.API.Contracts;
+using OS.API.Contracts.Requests;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using OS.API.Models;
-using OS.Data.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 
 namespace OS.API.Controllers
 {
-    [Route("os/users")]
     [ApiController]
+    [Route(Routes.Users.AllUsers)]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -23,7 +24,6 @@ namespace OS.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Data.Entities.User>>> GetUsersAsync()
         {
@@ -33,9 +33,9 @@ namespace OS.API.Controllers
         }
     }
 
-
-    [Route("os/user")]
     [ApiController]
+    [Route(Routes.Users.OneUser)]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -46,43 +46,41 @@ namespace OS.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Data.Entities.User>> GetUserAsync(int id)
+        public async Task<ActionResult<Data.Entities.User>> GetUserAsync([FromQuery] int id)
         {
-            var userEntity = await _userService.GetUserModelAsync(id);
-            if (userEntity is null)
+            var dtoEntity = await _userService.GetUserModelAsync(id);
+            if (dtoEntity is null)
             {
                 return NotFound();
             }
-            return Ok(userEntity);
+            return Ok(dtoEntity);
         }
 
         [HttpPut("{id}")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUserAsync(int id, PutUserScaffold scaffold)
+        public async Task<IActionResult> UpdateUserAsync([FromQuery] int id, [FromBody] UpdateEntityRequest reqEntity)
         {
-            if (id != scaffold.Id)
+            if (id != reqEntity.Id)
             {
                 return BadRequest();
             }
 
-            var userEntity = await _userService.GetUserEntityAsync(id);
-            if (userEntity is null)
+            var dtoEntity = await _userService.GetUserEntityAsync(id);
+            if (dtoEntity is null)
             {
                 return NotFound();
             }
 
             var user = new Data.Entities.User
             {
-                Id = scaffold.Id,
-                Username = scaffold.Username,
-                Password = userEntity.Password,
-                JoinDate = userEntity.JoinDate,
+                Id = reqEntity.Id,
+                Username = reqEntity.Username,
+                Password = dtoEntity.Password,
+                JoinDate = dtoEntity.JoinDate,
             };
 
             await _userService.UpdateUserAsync(user);
@@ -91,20 +89,19 @@ namespace OS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteUserAsync(int Id, DeleteUserScaffold scaffold)
+        public async Task<IActionResult> DeleteUserAsync([FromQuery] int Id, [FromBody] DeleteEntityRequest reqEntity)
         {
-            var userEntity = await _userService.GetUserModelAsync(Id);
+            var dtoEntity = await _userService.GetUserModelAsync(Id);
 
-            if (userEntity is null)
+            if (dtoEntity is null)
             {
                 return NotFound();
             }
 
-            if (userEntity.Id != scaffold.Id)
+            if (dtoEntity.Id != reqEntity.Id)
             {
                 return BadRequest();
             }

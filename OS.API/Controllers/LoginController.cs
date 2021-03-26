@@ -1,86 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using OS.API.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
+using OS.API.Contracts;
+using OS.API.Contracts.Requests;
+using OS.API.Contracts.Responses;
+using OS.API.Services.Interfaces;
 using OS.Data.Interfaces;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace OS.API.Controllers
 {
-    [Route("os/login")]
     [ApiController]
+    [Route(Routes.Auth.Login)]
+    [AllowAnonymous]
     public class LoginController : ControllerBase
     {
-        private readonly IConfiguration _config;
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public LoginController(IConfiguration config, IUserService userService)
+        public LoginController(IUserService userService, ITokenService tokenService)
         {
-            _config = config;
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Login([FromBody] LoginUserScaffold scaffold)
+        public IActionResult LoginUserAsync([FromBody] UserAuthRequest reqEntity)
         {
-            var userEntity = _userService.GetUserByUsernameAsync(scaffold.Username);
+            var dtoEntity = _userService.GetUserByUsernameAsync(reqEntity.Username);
 
-            if (userEntity is null)
+            if (dtoEntity is null)
             {
                 return Unauthorized();
             }
 
-            if (!userEntity.Password.Equals(scaffold.Password))
+            if (!dtoEntity.Password.Equals(reqEntity.Password))
             {
                 return Conflict();
             }
 
             var user = new Core.Models.User
             {
-                Id = userEntity.Id,
-                Username = userEntity.Username,
-                JoinDate = userEntity.JoinDate
+                Id = dtoEntity.Id,
+                Username = dtoEntity.Username,
+                JoinDate = dtoEntity.JoinDate
             };
 
-            var token = new { token = GenerateJSONWebToken(user) };
-
-            return Ok(token);
-        }
-
-        private string GenerateJSONWebToken(Core.Models.User user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var tokenClaims = new[] {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-                new Claim("joinDate", user.JoinDate.ToString("")),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString())
+            var response = new UserAuthReponse
+            {
+                Token = _tokenService.GenerateJWT(user),
+                Message = "Authorized",
+                IsAuth = true
             };
 
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Issuer"],
-                claims: tokenClaims,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(response);
         }
-
     }
 }

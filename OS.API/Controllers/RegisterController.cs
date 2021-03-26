@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OS.API.Models;
 using OS.Data.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using OS.API.Contracts;
+using OS.API.Contracts.Requests;
 
 namespace OS.API.Controllers
 {
-    [Route("os/register")]
     [ApiController]
+    [Route(Routes.Auth.Register)]
+    [AllowAnonymous]
     public class RegisterController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -23,26 +24,25 @@ namespace OS.API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<Core.Models.User>> CreateUserAsync(NewUserScaffold scaffold)
+        public async Task<ActionResult> RegisterUserAsync(UserAuthRequest reqEntity)
         {
-            var userEntity = _userService.GetUserByUsernameAsync(scaffold.Username);
-            if (userEntity is not null)
+            var dtoEntity = _userService.GetUserByUsernameAsync(reqEntity.Username);
+            if (dtoEntity is not null)
             {
                 return Conflict();
-            }
+            }  
 
-            var userScaffold = new Data.Entities.User
+            var user = new Data.Entities.User
             {
-                Username = scaffold.Username,
-                Password = scaffold.Password
+                Username = reqEntity.Username,
+                Password = reqEntity.Password
             };
 
-            var createdUser = await _userService.CreateUserAsync(userScaffold);
+            var createdUser = await _userService.CreateUserAsync(user);
 
-            return Created(nameof(createdUser), createdUser);
+            return Created("User Created", createdUser);
         }
     }
 }
