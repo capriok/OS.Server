@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace OS.API.Controllers.User
 {
     [ApiController]
-    [Route(Routes.Auth.Register)]
+    [Route(Routes.User.Register)]
     [AllowAnonymous]
     public class RegisterController : ControllerBase
     {

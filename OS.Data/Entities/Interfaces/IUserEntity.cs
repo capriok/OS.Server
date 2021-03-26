@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.Data.Entities.User.Interfaces
+namespace OS.Data.Entities.Interfaces
 {
     public interface IUserEntity
     {

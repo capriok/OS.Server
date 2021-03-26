@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace OS.API.Controllers.User
 {
     [ApiController]
-    [Route(Routes.Auth.Login)]
+    [Route(Routes.User.Login)]
     [AllowAnonymous]
     public class LoginController : ControllerBase
     {

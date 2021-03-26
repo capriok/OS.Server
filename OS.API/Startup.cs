@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OS.Data.Repositories.Interfaces;
-using OS.Data.Repositories;
-using OS.API.Services.Interfaces;
-using OS.API.Services;
+using OS.API.Controllers.Oversite;
 using System;
 using System.Text;
 using System.Collections.Generic;
@@ -34,9 +31,7 @@ namespace OS.API
 
             new AuthenticationInstaller(services, Configuration);
 
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            new ScopeInstaller(services, Configuration);
 
             services.AddControllers();
         }

@@ -1,4 +1,4 @@
-﻿using OS.Data.Entities.User;
+﻿using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;

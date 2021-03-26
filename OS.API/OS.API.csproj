@@ -24,10 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\Models\Oversite\" />
     <Folder Include="Contracts\Requests\Oversite\" />
     <Folder Include="Contracts\Responses\Oversite\" />
-    <Folder Include="Controllers\Oversite\" />
   </ItemGroup>
 
 </Project>

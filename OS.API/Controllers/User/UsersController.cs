@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OS.API.Contracts;
 using OS.API.Contracts.Models.User;
@@ -11,7 +12,8 @@ using System.Threading.Tasks;
 namespace OS.API.Controllers.User
 {
     [ApiController]
-    [Route(Routes.Users.AllUsers)]
+    [Route(Routes.User.AllUsers)]
+    [AllowAnonymous]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;

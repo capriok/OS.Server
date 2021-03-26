@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using OS.API.Contracts;
 using OS.API.Contracts.Requests.User;
 using OS.API.Contracts.Models.User;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace OS.API.Controllers.User
 {
     [ApiController]
-    [Route(Routes.Users.OneUser)]
+    [Route(Routes.User.OneUser)]
     [Authorize]
     public class UserController : ControllerBase
     {

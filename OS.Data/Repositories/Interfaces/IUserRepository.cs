@@ -1,5 +1,5 @@
 ﻿using OS.Data;
-using OS.Data.Entities.User;
+using OS.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace OS.Data.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<UserEntity> FindByIdAsync(int id);
-        UserEntity FindByUsername(string Username);
-        Task<UserEntity> UpdateAsync(UserEntity user);
-        Task<UserEntity> AddAsync(UserEntity user);
-        Task RemoveAsync(int id);
         IQueryable<UserEntity> GetQueryable();
+        UserEntity FindByUsername(string Username);
+        Task<UserEntity> FindByIdAsync(int id);
+        Task<UserEntity> AddAsync(UserEntity user);
+        Task<UserEntity> UpdateAsync(UserEntity user);
+        Task RemoveAsync(int id);
     }
 }
