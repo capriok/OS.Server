@@ -1,4 +1,4 @@
-﻿using OS.API.Models.User;
+﻿using OS.API.Contracts.Models.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;

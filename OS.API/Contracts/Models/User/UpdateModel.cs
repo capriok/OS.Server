@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Models.User
+namespace OS.API.Contracts.Models.User
 {
-    public class UpdateModel : IUpdateModel
+    public class UpdateModel
     {
         public int Id { get; set; }
         public string Username{ get; set; }

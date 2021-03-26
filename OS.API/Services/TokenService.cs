@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using OS.API.Services.Interfaces;
-using OS.API.Models.User;
+using OS.API.Contracts.Models.User;
 using System;
 using System.Text;
 using System.Collections.Generic;

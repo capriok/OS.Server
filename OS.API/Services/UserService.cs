@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OS.API.Models.User;
+using Microsoft.Extensions.Logging;
+using OS.API.Contracts.Models.User;
 using OS.API.Services.Interfaces;
 using OS.Data.Entities.User;
 using OS.Data.Repositories.Interfaces;
@@ -13,10 +14,12 @@ namespace OS.API.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ILogger _log;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, ILogger<UserService> logger)
         {
             _userRepository = userRepository;
+            _log = logger;
         }
 
         public async Task<List<UserModel>> GetAllAsync()
@@ -78,10 +81,13 @@ namespace OS.API.Services
             var userEntity = new UserEntity
             {
                 Username = authModel.Username,
-                Password = authModel.Password
-            };
+                Password = authModel.Password,
+                JoinDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss").Replace("T", " "))
+        };
 
             var createdEntity = await _userRepository.AddAsync(userEntity);
+
+            _log.LogInformation(createdEntity.JoinDate.ToString());
 
             return new UserModel
             {

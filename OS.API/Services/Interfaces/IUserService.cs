@@ -1,5 +1,4 @@
-﻿using OS.API.Models;
-using OS.API.Models.User;
+﻿using OS.API.Contracts.Models.User;
 using OS.Data.Entities.User;
 using System;
 using System.Collections.Generic;
