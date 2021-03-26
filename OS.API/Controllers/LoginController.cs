@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using OS.API.Contracts;
-using OS.API.Contracts.Requests;
-using OS.API.Contracts.Responses;
+using OS.API.Contracts.Requests.User;
+using OS.API.Contracts.Responses.User;
+using OS.API.Models.User;
 using OS.API.Services.Interfaces;
-using OS.Data.Interfaces;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OS.API.Controllers
 {
@@ -33,30 +31,30 @@ namespace OS.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult LoginUserAsync([FromBody] UserAuthRequest reqEntity)
+        public IActionResult LoginUserAsync([FromBody] AuthRequest reqEntity)
         {
-            var dtoEntity = _userService.GetUserByUsernameAsync(reqEntity.Username);
+            var authEntity = _userService.GetOneAuthDetails(reqEntity.Username);
 
-            if (dtoEntity is null)
+            if (authEntity is null)
             {
                 return Unauthorized();
             }
 
-            if (!dtoEntity.Password.Equals(reqEntity.Password))
+            if (!authEntity.Password.Equals(reqEntity.Password))
             {
                 return Conflict();
             }
 
-            var user = new Core.Models.User
+            var authedUser = new UserModel
             {
-                Id = dtoEntity.Id,
-                Username = dtoEntity.Username,
-                JoinDate = dtoEntity.JoinDate
+                Id = authEntity.Id,
+                Username = authEntity.Username,
+                JoinDate = authEntity.JoinDate
             };
 
-            var response = new UserAuthReponse
+            var response = new AuthReponse
             {
-                Token = _tokenService.GenerateJWT(user),
+                Token = _tokenService.GenerateJWT(authedUser),
                 Message = "Authorized",
                 IsAuth = true
             };

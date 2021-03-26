@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using OS.API.Contracts;
+using OS.API.Contracts.Requests.User;
+using OS.API.Models.User;
+using OS.API.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using OS.Data.Interfaces;
-using OS.API.Contracts;
-using OS.API.Contracts.Requests;
 
 namespace OS.API.Controllers
 {
@@ -26,21 +27,21 @@ namespace OS.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult> RegisterUserAsync(UserAuthRequest reqEntity)
+        public async Task<ActionResult> RegisterUserAsync([FromBody] AuthRequest reqEntity)
         {
-            var dtoEntity = _userService.GetUserByUsernameAsync(reqEntity.Username);
-            if (dtoEntity is not null)
+            var authEntity = _userService.GetOneAuthDetails(reqEntity.Username);
+            if (authEntity is not null)
             {
                 return Conflict();
             }  
 
-            var user = new Data.Entities.User
+            var newUser = new AuthModel
             {
                 Username = reqEntity.Username,
                 Password = reqEntity.Password
             };
 
-            var createdUser = await _userService.CreateUserAsync(user);
+            var createdUser = await _userService.CreateAsync(newUser);
 
             return Created("User Created", createdUser);
         }

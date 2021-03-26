@@ -3,8 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using OS.API.Services.Interfaces;
-using OS.Core.Models;
-using OS.Data.Interfaces;
+using OS.API.Models.User;
 using System;
 using System.Text;
 using System.Collections.Generic;
@@ -23,7 +22,7 @@ namespace OS.API.Services
             _config = config;
         }
 
-        public string GenerateJWT(User user)
+        public string GenerateJWT(UserModel user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

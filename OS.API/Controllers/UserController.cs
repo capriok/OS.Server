@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OS.Data.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using OS.API.Contracts;
-using OS.API.Contracts.Requests;
+using OS.API.Contracts.Requests.User;
+using OS.API.Models.User;
+using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +12,6 @@ using System.Threading.Tasks;
 
 namespace OS.API.Controllers
 {
-    [ApiController]
-    [Route(Routes.Users.AllUsers)]
-    //[Authorize]
-    public class UsersController : ControllerBase
-    {
-        private readonly IUserService _userService;
-
-        public UsersController(IUserService userService)
-        {
-            _userService = userService;
-        }
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Data.Entities.User>>> GetUsersAsync()
-        {
-            var userList = await _userService.GetUsersAsync();
-
-            return Ok(userList);
-        }
-    }
-
     [ApiController]
     [Route(Routes.Users.OneUser)]
     [Authorize]
@@ -48,42 +27,41 @@ namespace OS.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Data.Entities.User>> GetUserAsync([FromQuery] int id)
+        public async Task<ActionResult<UserModel>> GetUserAsync([FromRoute] int id)
         {
-            var dtoEntity = await _userService.GetUserModelAsync(id);
-            if (dtoEntity is null)
+            var reqMatch = await _userService.GetOneModelAsync(id);
+            if (reqMatch is null)
             {
                 return NotFound();
             }
-            return Ok(dtoEntity);
+            return Ok(reqMatch);
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUserAsync([FromQuery] int id, [FromBody] UpdateEntityRequest reqEntity)
+        public async Task<IActionResult> UpdateUserAsync([FromRoute] int id, [FromBody] UpdateRequest reqEntity)
         {
             if (id != reqEntity.Id)
             {
                 return BadRequest();
             }
 
-            var dtoEntity = await _userService.GetUserEntityAsync(id);
-            if (dtoEntity is null)
+            var reqMatch = await _userService.GetOneEntityAsync(id);
+            if (reqMatch is null)
             {
                 return NotFound();
             }
 
-            var user = new Data.Entities.User
+            var updateModel = new UpdateModel
             {
-                Id = reqEntity.Id,
+                Id = reqMatch.Id,
                 Username = reqEntity.Username,
-                Password = dtoEntity.Password,
-                JoinDate = dtoEntity.JoinDate,
+                Password = reqMatch.Password
             };
 
-            await _userService.UpdateUserAsync(user);
+            await _userService.UpdateAsync(updateModel);
 
             return NoContent();
         }
@@ -92,22 +70,21 @@ namespace OS.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteUserAsync([FromQuery] int Id, [FromBody] DeleteEntityRequest reqEntity)
+        public async Task<IActionResult> DeleteUserAsync([FromRoute] int id, [FromBody] DeleteRequest reqEntity)
         {
-            var dtoEntity = await _userService.GetUserModelAsync(Id);
-
-            if (dtoEntity is null)
-            {
-                return NotFound();
-            }
-
-            if (dtoEntity.Id != reqEntity.Id)
+            if (id != reqEntity.Id)
             {
                 return BadRequest();
             }
 
+            var reqMatch = await _userService.GetOneModelAsync(id);
 
-            await _userService.DeleteUserAsync(Id);
+            if (reqMatch is null)
+            {
+                return NotFound();
+            }
+
+            await _userService.DeleteUserAsync(id);
 
             return NoContent();
         }

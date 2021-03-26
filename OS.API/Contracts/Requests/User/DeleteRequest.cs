@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Contracts.Requests
+namespace OS.API.Contracts.Requests.User
 {
-    public class DeleteEntityRequest
+    public class DeleteRequest
     {
         public int Id { get; set; }
     }

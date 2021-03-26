@@ -1,11 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OS.Data.Interfaces;
+using OS.API.Models.User;
+using OS.API.Services.Interfaces;
+using OS.Data.Entities.User;
+using OS.Data.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.Core.Services
+namespace OS.API.Services
 {
     public class UserService : IUserService
     {
@@ -16,11 +19,11 @@ namespace OS.Core.Services
             _userRepository = userRepository;
         }
 
-        public async Task<List<Models.User>> GetUsersAsync()
+        public async Task<List<UserModel>> GetAllAsync()
         {
-            IQueryable<Data.Entities.User> query = _userRepository.GetQueryable();
+            IQueryable<UserEntity> query = _userRepository.GetQueryable();
 
-            return await query.Select(user => new Models.User
+            return await query.Select(user => new UserModel
             {
                 Id = user.Id,
                 Username = user.Username,
@@ -28,7 +31,7 @@ namespace OS.Core.Services
             })
             .ToListAsync();
         }
-        public Data.Entities.User GetUserByUsernameAsync(string Username)
+        public UserEntity GetOneAuthDetails(string Username)
         {
             var userEntity = _userRepository.FindByUsername(Username);
 
@@ -40,7 +43,7 @@ namespace OS.Core.Services
             return userEntity;
         }
 
-        public async Task<Data.Entities.User> GetUserEntityAsync(int Id)
+        public async Task<UserEntity> GetOneEntityAsync(int Id)
         {
             var userEntity = await _userRepository.FindByIdAsync(Id);
 
@@ -50,10 +53,9 @@ namespace OS.Core.Services
             }
 
             return userEntity;
-
         }
 
-        public async Task<Models.User> GetUserModelAsync(int Id)
+        public async Task<UserModel> GetOneModelAsync(int Id)
         {
             var userEntity = await _userRepository.FindByIdAsync(Id);
 
@@ -62,7 +64,7 @@ namespace OS.Core.Services
                 return null;
             }
 
-            return new Models.User
+            return new UserModel
             {
                 Id = userEntity.Id,
                 Username = userEntity.Username,
@@ -70,41 +72,41 @@ namespace OS.Core.Services
             };
         }
 
-        public async Task<Models.User> CreateUserAsync(Data.Entities.User user)
+        public async Task<UserModel> CreateAsync(AuthModel authModel)
         {
-            if (user is null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
 
-            string mySqlCurrentDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-
-            var userEntity = new Data.Entities.User
+            var userEntity = new UserEntity
             {
-                Username = user.Username,
-                Password = user.Password,
-                JoinDate = DateTime.Parse(mySqlCurrentDateTime)
+                Username = authModel.Username,
+                Password = authModel.Password
             };
 
-            userEntity = await _userRepository.AddAsync(userEntity);
+            var createdEntity = await _userRepository.AddAsync(userEntity);
 
-            return new Models.User
+            return new UserModel
             {
-                Id = userEntity.Id,
-                Username = userEntity.Username,
-                JoinDate = userEntity.JoinDate
+                Id = createdEntity.Id,
+                Username = createdEntity.Username,
+                JoinDate = createdEntity.JoinDate
             };
         }
 
-        public async Task<Models.User> UpdateUserAsync(Data.Entities.User user)
+        public async Task<UserModel> UpdateAsync(UpdateModel reqModel)
         {
-            var userEntity = await _userRepository.UpdateAsync(user);
-
-            return new Models.User
+            var userEntity = new UserEntity
             {
-                Id = userEntity.Id,
-                Username = userEntity.Username,
-                JoinDate = userEntity.JoinDate
+                Id = reqModel.Id,
+                Username = reqModel.Username,
+                Password = reqModel.Password
+            };
+
+            var updatedEntity = await _userRepository.UpdateAsync(userEntity);
+
+            return new UserModel
+            {
+                Id = updatedEntity.Id,
+                Username = updatedEntity.Username,
+                JoinDate = updatedEntity.JoinDate
             };
         }
 

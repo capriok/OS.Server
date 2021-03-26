@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OS.Data;
+using OS.Data.Entities.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,6 @@ namespace OS.Data
     {
         public OSContext(DbContextOptions<OSContext> options) : base(options) { }
 
-        public DbSet<Entities.User> Users { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
     }
 }

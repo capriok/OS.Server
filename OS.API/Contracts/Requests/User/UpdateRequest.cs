@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.Core.Models
+namespace OS.API.Contracts.Requests.User
 {
-    public class User
+    public class UpdateRequest
     {
         public int Id { get; set; }
-        public string Username{ get; set; }
-        public DateTime JoinDate{ get; set; }
+        public string Username { get; set; }
     }
 }

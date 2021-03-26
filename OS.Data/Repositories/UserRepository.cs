@@ -1,4 +1,5 @@
-﻿using OS.Data.Interfaces;
+﻿using OS.Data.Entities.User;
+using OS.Data.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,24 +16,24 @@ namespace OS.Data.Repositories
             _OSContext = osContext;
         }
 
-        public IQueryable<Entities.User> GetQueryable()
+        public IQueryable<UserEntity> GetQueryable()
         {
             return _OSContext.Users.AsQueryable();
         }
 
-        public async Task<Entities.User> FindByIdAsync(int id)
-        {
-            return await _OSContext.Users.FindAsync(id);
-        }
-
-        public Entities.User FindByUsername(string username)
+        public UserEntity FindByUsername(string username)
         {
             return GetQueryable()
                 .Where(u => u.Username.Equals(username))
                 .FirstOrDefault();
         }
 
-        public async Task<Entities.User> AddAsync(Entities.User user)
+        public async Task<UserEntity> FindByIdAsync(int id)
+        {
+            return await _OSContext.Users.FindAsync(id);
+        }
+
+        public async Task<UserEntity> AddAsync(UserEntity user)
         {
             _OSContext.Users.Add(user);
             await _OSContext.SaveChangesAsync();
@@ -40,7 +41,7 @@ namespace OS.Data.Repositories
             return user;
         }
 
-        public async Task<Entities.User> UpdateAsync(Entities.User user)
+        public async Task<UserEntity> UpdateAsync(UserEntity user)
         {
             var local = _OSContext.Users.Local.FirstOrDefault(entity => entity.Id == user.Id);
             if (local is not null)
