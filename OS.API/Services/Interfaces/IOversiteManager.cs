@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OS.API.Services.Interfaces
 {
-    public interface IOversiteService
+    public interface IOversiteManager
     {
         Task<List<OversiteModel>> GetAllAsync();
         Task<OversiteEntity> GetOneEntityAsync(int Id);

@@ -22,7 +22,7 @@ namespace OS.API
             services.AddScoped<ICookieService, CookieService>();
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IOversiteService, OversiteService>();
+            services.AddScoped<IOversiteManager, OversiteManager>();
             services.AddScoped<IOversiteRepository, OversiteRepository>();
         }
     }

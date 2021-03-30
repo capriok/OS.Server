@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace OS.API.Services
 {
-    public class OversiteService : IOversiteService
+    public class OversiteManager : IOversiteManager
     {
 
         private readonly IOversiteRepository _oversiteRepository;
 
-        public OversiteService(IOversiteRepository oversiteRepository)
+        public OversiteManager(IOversiteRepository oversiteRepository)
         {
             _oversiteRepository = oversiteRepository;
         }

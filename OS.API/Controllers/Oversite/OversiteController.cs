@@ -16,11 +16,11 @@ namespace OS.API.Controllers.Oversite
     [Authorize]
     public class OversitesController : ControllerBase
     {
-       private readonly IOversiteService _oversiteService;
+       private readonly IOversiteManager _oversiteManager;
 
-        public OversitesController(IOversiteService oversiteService)
+        public OversitesController(IOversiteManager oversiteManager)
         {
-            _oversiteService = oversiteService;
+            _oversiteManager = oversiteManager;
         }
 
         [HttpGet]
@@ -28,7 +28,7 @@ namespace OS.API.Controllers.Oversite
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<OversiteModel>> AllUsersAsync()
         {
-            var reqMatch = await _oversiteService.GetAllAsync();
+            var reqMatch = await _oversiteManager.GetAllAsync();
             if (reqMatch is null)
             {
                 return NotFound();
