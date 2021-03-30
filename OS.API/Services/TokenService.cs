@@ -27,18 +27,13 @@ namespace OS.API.Services
             _cookieService = cookieService;
         }
 
-        private string GenerateAuthorizationRefreshToken()
-        {
-            return Guid.NewGuid().ToString();
-        }
-
-        private string GenerateAuthorizationToken(int id)
+        private string GenerateAuthorizationToken(string username)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var tokenClaims = new[] {
-                new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString())
             };
@@ -54,20 +49,26 @@ namespace OS.API.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public void GrantAuthorizationTokens(HttpResponse Response, UserModel user)
+        private string GenerateAuthorizationRefreshToken()
         {
-            GrantUsernameToken(Response, user.Username);
-            GrantJWTAuthToken(Response, user.Id);
-            GrantAuthorizationRefreshToken(Response, user.Id);
+            return Guid.NewGuid().ToString();
         }
 
         private void GrantUsernameToken(HttpResponse Response, string username)
         {
             _cookieService.AppendUsernameCookie(Response, username);
         }
-        private void GrantJWTAuthToken(HttpResponse Response, int id)
+
+        public void GrantAuthorizationTokens(HttpResponse Response, UserModel user)
         {
-            var authorizationToken = GenerateAuthorizationToken(id);
+            GrantUsernameToken(Response, user.Username);
+            GrantJWTAuthToken(Response, user.Username);
+            GrantAuthorizationRefreshToken(Response, user.Id);
+        }
+
+        private void GrantJWTAuthToken(HttpResponse Response, string username)
+        {
+            var authorizationToken = GenerateAuthorizationToken(username);
 
             _cookieService.AppendAuthorizationCookie(Response, authorizationToken);
         }

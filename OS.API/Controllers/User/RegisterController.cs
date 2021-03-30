@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OS.API.Contracts;
 using OS.API.Contracts.Requests.User;
+using OS.API.Contracts.Responses.User;
 using OS.API.Contracts.Models.User;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OS.API.Contracts.Responses.User;
 
 namespace OS.API.Controllers.User
 {
