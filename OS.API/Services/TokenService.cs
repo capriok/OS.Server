@@ -58,7 +58,7 @@ namespace OS.API.Services
         {
             GrantUsernameToken(Response, user.Username);
             GrantJWTAuthToken(Response, user.Id);
-            GrantAuthorizationRefreshToken(Response, user.Id );
+            GrantAuthorizationRefreshToken(Response, user.Id);
         }
 
         private void GrantUsernameToken(HttpResponse Response, string username)
@@ -76,11 +76,13 @@ namespace OS.API.Services
         {
             var refreshToken = GenerateAuthorizationRefreshToken();
 
-            _userService.UpdateAsync(new UpdateModel
+            var user = new UpdateModel
             {
                 Id = id,
                 RefreshToken = refreshToken,
-            });
+            };
+
+            _userService.UpdateAsync(user);
             _cookieService.AppendAuthorizationRefreshCookie(Response, refreshToken);
         }
     }

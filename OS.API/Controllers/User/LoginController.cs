@@ -32,7 +32,7 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult LoginUserAsync([FromBody] AuthRequest reqEntity)
+        public ActionResult<AuthResponse> LoginUserAsync([FromBody] AuthRequest reqEntity)
         {
             var authEntity = _userService.GetOneAuthDetails(reqEntity.Username);
 
@@ -54,10 +54,10 @@ namespace OS.API.Controllers.User
 
             _tokenService.GrantAuthorizationTokens(Response, authedUser);
 
-            var response = new AuthReponse
+            var response = new AuthResponse
             {
                 User = authedUser.Id,
-                LastLogin = DateTime.Now,
+                LastLogin = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm"),
             };
 
             return Ok(response);

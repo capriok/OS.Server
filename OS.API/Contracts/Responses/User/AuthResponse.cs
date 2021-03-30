@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace OS.API.Contracts.Responses.User
 {
-    public class AuthReponse
+    public class AuthResponse
     {
         public int User { get; set; }
-        public DateTime LastLogin{ get; set; }
+        public string LastLogin{ get; set; }
     }
 }

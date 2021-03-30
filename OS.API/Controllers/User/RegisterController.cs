@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OS.API.Contracts.Responses.User;
 
 namespace OS.API.Controllers.User
 {
@@ -27,7 +28,7 @@ namespace OS.API.Controllers.User
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult> RegisterUserAsync([FromBody] AuthRequest reqEntity)
+        public async Task<ActionResult<AuthResponse>> RegisterUserAsync([FromBody] AuthRequest reqEntity)
         {
             var authEntity = _userService.GetOneAuthDetails(reqEntity.Username);
             if (authEntity is not null)
@@ -43,7 +44,12 @@ namespace OS.API.Controllers.User
 
             var createdUser = await _userService.CreateAsync(newUser);
 
-            return Created(createdUser.Id.ToString(), new { Id = createdUser.Id });
+            var response = new AuthResponse
+            {
+                User = createdUser.Id,
+            };
+
+            return Created(createdUser.Id.ToString(), response);
         }
     }
 }
