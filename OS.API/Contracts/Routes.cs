@@ -16,6 +16,7 @@ namespace OS.API.Contracts
             public const string OneUser = Root + "/user";
             public const string Login = Root + "/login";
             public const string Register = Root + "/register";
+            public const string Refresh = Root + "/refreshAccessToken";
         }
 
         public static class Oversite

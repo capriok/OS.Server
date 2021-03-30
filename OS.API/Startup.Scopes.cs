@@ -17,6 +17,7 @@ namespace OS.API
         public ScopeInstaller(IServiceCollection services, IConfiguration Configuration)
         {
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ICookieService, CookieService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOversiteService, OversiteService>();

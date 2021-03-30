@@ -7,8 +7,7 @@ namespace OS.API.Contracts.Responses.User
 {
     public class AuthReponse
     {
-        public string Token { get; set; }
-        public string Message{ get; set; }
-        public bool IsAuth { get; set; }
+        public int User { get; set; }
+        public DateTime LastLogin{ get; set; }
     }
 }

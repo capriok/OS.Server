@@ -10,7 +10,7 @@ namespace OS.API.Services.Interfaces
     public interface IUserService
     {
         Task<List<UserModel>> GetAllAsync();
-        UserEntity GetOneAuthDetails(string Username);
+        AuthModel GetOneAuthDetails(string Username);
         Task<UserEntity> GetOneEntityAsync(int Id);
         Task<UserModel> GetOneModelAsync(int Id);
         Task<UserModel> CreateAsync(AuthModel user);

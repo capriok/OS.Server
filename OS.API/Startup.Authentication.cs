@@ -14,11 +14,13 @@ namespace OS.API
     {
         public AuthenticationInstaller(IServiceCollection services, IConfiguration Configuration)
         {
-            services.AddAuthentication(option =>
+            services
+            .AddAuthentication(options =>
             {
-                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -32,6 +34,27 @@ namespace OS.API
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])
                     )
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (context.Request.Cookies.ContainsKey(Configuration["Cookie:Username"]))
+                        {
+                            context.Token = context.Request.Cookies[Configuration["Cookie:Username"]];
+                        }
+
+                        if (context.Request.Cookies.ContainsKey(Configuration["Cookie:AuthToken"]))
+                        {
+                            context.Token = context.Request.Cookies[Configuration["Cookie:Username"]];
+                        }
+
+                        if (context.Request.Cookies.ContainsKey(Configuration["Cookie:RefreshToken"]))
+                        {
+                            context.Token = context.Request.Cookies[Configuration["Cookie:RefreshToken"]];
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
         }

@@ -12,12 +12,13 @@ namespace OS.API
     {
         public CorsInstaller(IServiceCollection services, IConfiguration Configuration)
         {
-            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            services.AddCors(o => o.AddPolicy(Configuration["Cors:Policy"], builder =>
             {
                 builder
+                .WithOrigins(Configuration["Cors:Origins"])
+                .AllowCredentials()
                 .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowAnyOrigin();
+                .AllowAnyMethod();
             }));
         }
     }

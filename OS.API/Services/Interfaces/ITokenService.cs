@@ -1,4 +1,6 @@
-﻿using OS.API.Contracts.Models.User;
+﻿using Microsoft.AspNetCore.Http;
+using OS.API.Contracts.Models.User;
+using OS.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,6 @@ namespace OS.API.Services.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateJWT(UserModel user);
+        void GrantAuthorizationTokens(HttpResponse Response, UserModel user);
     }
 }

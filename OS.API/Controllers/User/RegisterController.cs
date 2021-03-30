@@ -33,7 +33,7 @@ namespace OS.API.Controllers.User
             if (authEntity is not null)
             {
                 return Conflict();
-            }  
+            }
 
             var newUser = new AuthModel
             {
@@ -43,7 +43,7 @@ namespace OS.API.Controllers.User
 
             var createdUser = await _userService.CreateAsync(newUser);
 
-            return Created("User Created", createdUser);
+            return Created(createdUser.Id.ToString(), new { Id = createdUser.Id });
         }
     }
 }

@@ -14,24 +14,24 @@ namespace OS.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public IConfiguration _config { get; }
 
-        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration config)
+        {
+            _config = config;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            new SwaggerInstaller(services, Configuration);
+            new SwaggerInstaller(services, _config);
 
-            new DbContextInstaller(services, Configuration);
+            new DbContextInstaller(services, _config);
 
-            new CorsInstaller(services, Configuration);
+            new CorsInstaller(services, _config);
 
-            new AuthenticationInstaller(services, Configuration);
+            new AuthenticationInstaller(services, _config);
 
-            new ScopeInstaller(services, Configuration);
+            new ScopeInstaller(services, _config);
 
             services.AddControllers();
         }
@@ -49,7 +49,7 @@ namespace OS.API
                 c.SwaggerEndpoint("v1/swagger.json", "Oversites API");
             });
 
-            app.UseCors("MyPolicy");
+            app.UseCors(_config["Cors:Policy"]);
 
             app.UseHttpsRedirection();
 
