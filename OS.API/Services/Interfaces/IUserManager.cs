@@ -1,4 +1,4 @@
-﻿using OS.API.Contracts.Models.User;
+﻿using OS.API.Models.User;
 using OS.Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OS.API.Services.Interfaces
 {
-    public interface IUserService
+    public interface IUserManager
     {
         Task<List<UserModel>> GetAllAsync();
         AuthModel GetOneAuthDetails(string Username);

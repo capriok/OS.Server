@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Contracts.Requests.User
+namespace OS.API.Models.User
 {
-    public class DeleteRequest
+    public class UserModel
     {
         public int Id { get; set; }
+        public string Username{ get; set; }
+        public DateTime JoinDate{ get; set; }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OS.API.Contracts;
-using OS.API.Contracts.Models.User;
+using OS.API.Models.User;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,18 +15,18 @@ namespace OS.API.Controllers.User
     [AllowAnonymous]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserManager _userManager;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserManager userManager)
         {
-            _userService = userService;
+            _userManager = userManager;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<UserModel>>> GetUsersAsync()
         {
-            var allUsers = await _userService.GetAllAsync();
+            var allUsers = await _userManager.GetAllAsync();
 
             return Ok(allUsers);
         }

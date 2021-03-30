@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OS.API.Contracts;
-using OS.API.Contracts.Requests.User;
-using OS.API.Contracts.Models.User;
+using OS.API.Models.User;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,11 +15,11 @@ namespace OS.API.Controllers.User
     [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserManager _userManager;
 
-        public UserController(IUserService userService)
+        public UserController(IUserManager userManager)
         {
-            _userService = userService;
+            _userManager = userManager;
         }
 
         [HttpGet("{id}")]
@@ -29,7 +27,7 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserModel>> GetUserAsync([FromRoute] int id)
         {
-            var reqMatch = await _userService.GetOneModelAsync(id);
+            var reqMatch = await _userManager.GetOneModelAsync(id);
             if (reqMatch is null)
             {
                 return NotFound();
@@ -41,14 +39,14 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUserAsync([FromRoute] int id, [FromBody] UpdateRequest reqEntity)
+        public async Task<IActionResult> UpdateUserAsync([FromRoute] int id, [FromBody] UpdateModel reqEntity)
         {
             if (id != reqEntity.Id)
             {
                 return BadRequest();
             }
 
-            var reqMatch = await _userService.GetOneEntityAsync(id);
+            var reqMatch = await _userManager.GetOneEntityAsync(id);
             if (reqMatch is null)
             {
                 return NotFound();
@@ -61,7 +59,7 @@ namespace OS.API.Controllers.User
                 Password = reqMatch.Password
             };
 
-            await _userService.UpdateAsync(updateModel);
+            await _userManager.UpdateAsync(updateModel);
 
             return NoContent();
         }
@@ -70,21 +68,21 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteUserAsync([FromRoute] int id, [FromBody] DeleteRequest reqEntity)
+        public async Task<IActionResult> DeleteUserAsync([FromRoute] int id, [FromBody] UserModel reqEntity)
         {
             if (id != reqEntity.Id)
             {
                 return BadRequest();
             }
 
-            var reqMatch = await _userService.GetOneModelAsync(id);
+            var reqMatch = await _userManager.GetOneModelAsync(id);
 
             if (reqMatch is null)
             {
                 return NotFound();
             }
 
-            await _userService.DeleteUserAsync(id);
+            await _userManager.DeleteUserAsync(id);
 
             return NoContent();
         }

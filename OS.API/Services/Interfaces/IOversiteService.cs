@@ -1,4 +1,4 @@
-﻿using OS.API.Controllers.Oversite;
+﻿using OS.API.Models.Oversite;
 using OS.Data.Entities;
 using System;
 using System.Collections.Generic;

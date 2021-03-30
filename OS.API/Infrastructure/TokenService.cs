@@ -1,29 +1,30 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using OS.API.Models.User;
+using OS.API.Infrastructure.Interfaces;
 using OS.API.Services.Interfaces;
-using OS.API.Contracts.Models.User;
 using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Services
+namespace OS.API.Infrastructure
 {
     public class TokenService : ITokenService
     {
 
         private readonly IConfiguration _config;
-        private readonly IUserService _userService;
+        private readonly IUserManager _userManager;
         private readonly ICookieService _cookieService;
 
-        public TokenService(IConfiguration config, IUserService userService, ICookieService cookieService)
+        public TokenService(IConfiguration config, IUserManager userManager, ICookieService cookieService)
         {
             _config = config;
-            _userService = userService;
+            _userManager = userManager;
             _cookieService = cookieService;
         }
 
@@ -83,7 +84,7 @@ namespace OS.API.Services
                 RefreshToken = refreshToken,
             };
 
-            _userService.UpdateAsync(user);
+            _userManager.UpdateAsync(user);
             _cookieService.AppendAuthorizationRefreshCookie(Response, refreshToken);
         }
     }

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Contracts
+namespace OS.API.Controllers
 {
     public static class Routes
     {
         private const string Root = "os";
-
 
         public static class User
         {

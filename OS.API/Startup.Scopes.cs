@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OS.Data.Repositories.Interfaces;
-using OS.Data.Repositories;
+using OS.API.Infrastructure.Interfaces;
+using OS.API.Infrastructure;
 using OS.API.Services.Interfaces;
 using OS.API.Services;
+using OS.Data.Repositories.Interfaces;
+using OS.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace OS.API
         {
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICookieService, CookieService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOversiteService, OversiteService>();
             services.AddScoped<IOversiteRepository, OversiteRepository>();

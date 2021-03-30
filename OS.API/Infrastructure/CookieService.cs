@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
-using OS.API.Services.Interfaces;
+using OS.API.Infrastructure.Interfaces;
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Services
+namespace OS.API.Infrastructure
 {
     public class CookieService : ICookieService
     {

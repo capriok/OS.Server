@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OS.API.Contracts;
-using OS.API.Contracts.Models.User;
-using OS.API.Contracts.Requests.User;
-using OS.API.Contracts.Responses.User;
+using OS.API.Models.User;
+using OS.API.Infrastructure.Interfaces;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,12 +17,12 @@ namespace OS.API.Controllers.User
 
     public class LoginController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserManager _userManager;
         private readonly ITokenService _tokenService;
 
-        public LoginController(IUserService userService, ITokenService tokenService)
+        public LoginController(IUserManager userManager, ITokenService tokenService)
         {
-            _userService = userService;
+            _userManager = userManager;
             _tokenService = tokenService;
         }
 
@@ -32,9 +30,9 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<AuthResponse> LoginUserAsync([FromBody] AuthRequest reqEntity)
+        public ActionResult<AuthResponse> LoginUserAsync([FromBody] AuthModel reqEntity)
         {
-            var authEntity = _userService.GetOneAuthDetails(reqEntity.Username);
+            var authEntity = _userManager.GetOneAuthDetails(reqEntity.Username);
 
             if (authEntity is null)
             {

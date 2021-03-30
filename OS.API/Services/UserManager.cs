@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OS.API.Contracts.Models.User;
+using OS.API.Models.User;
 using OS.API.Services.Interfaces;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace OS.API.Services
 {
-    public class UserService : IUserService
+    public class UserManager : IUserManager
     {
         private readonly IUserRepository _userRepository;
 
-        public UserService(IUserRepository userRepository)
+        public UserManager(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }

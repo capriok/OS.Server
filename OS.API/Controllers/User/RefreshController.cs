@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OS.API.Contracts;
-using OS.API.Contracts.Models.User;
-using OS.API.Contracts.Responses.User;
+using OS.API.Models.User;
+using OS.API.Infrastructure.Interfaces;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -20,14 +19,14 @@ namespace OS.API.Controllers.User
     public class RefreshController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly IUserService _userService;
+        private readonly IUserManager _userManager;
         private readonly ITokenService _tokenService;
         private readonly ILogger _log;
 
-        public RefreshController(IConfiguration config, IUserService userService, ITokenService tokenService, ILogger<RefreshController> log)
+        public RefreshController(IConfiguration config, IUserManager userManager, ITokenService tokenService, ILogger<RefreshController> log)
         {
             _config = config;
-            _userService = userService;
+            _userManager = userManager;
             _tokenService = tokenService;
             _log = log;
         }
@@ -47,7 +46,7 @@ namespace OS.API.Controllers.User
                 return Unauthorized();
             }
 
-            var authEntity = _userService.GetOneAuthDetails(usernameCookie);
+            var authEntity = _userManager.GetOneAuthDetails(usernameCookie);
 
             if (authEntity is null && !authEntity.RefreshToken.Equals(refreshTokenCookie))
             {

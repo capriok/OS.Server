@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OS.API.Contracts;
+using OS.API.Models.Oversite;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
