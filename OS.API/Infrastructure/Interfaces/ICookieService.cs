@@ -11,5 +11,8 @@ namespace OS.API.Infrastructure.Interfaces
         void AppendUsernameCookie(HttpResponse Response, string username);
         void AppendAuthorizationCookie(HttpResponse Response, string accessToken);
         void AppendAuthorizationRefreshCookie(HttpResponse Response, string refreshToken);
+        void DeleteUsernameCookie(HttpResponse Response);
+        void DeleteAuthorizationCookie(HttpResponse Response);
+        void DeleteRefreshAuthorizationCookie(HttpResponse Response);
     }
 }

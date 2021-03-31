@@ -13,20 +13,18 @@ namespace OS.API.Infrastructure
     {
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
-
+        private readonly CookieOptions cookieOptions = new ()
+        {
+            Secure = true,
+            HttpOnly = true,
+            SameSite = SameSiteMode.None
+            //SameSite = _env.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict
+        };
         public CookieService(IWebHostEnvironment env, IConfiguration config)
         {
             _env = env;
             _config = config;
         }
-
-        public CookieOptions cookieOptions = new CookieOptions()
-        {
-            Secure = true,
-            HttpOnly = true,
-            SameSite = SameSiteMode.None
-        };
-        //{ Secure = true, HttpOnly = true, SameSite = _env.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict };
 
         public void AppendUsernameCookie(HttpResponse Response, string username)
         {
@@ -41,6 +39,21 @@ namespace OS.API.Infrastructure
         public void AppendAuthorizationRefreshCookie(HttpResponse Response, string refreshToken)
         {
             Response.Cookies.Append(_config["Cookie:RefreshToken"], refreshToken, cookieOptions);
+        }
+
+        public void DeleteUsernameCookie(HttpResponse Response)
+        {
+            Response.Cookies.Delete(_config["Cookie:AuthTokenUsernameToken"]);
+        }
+
+        public void DeleteAuthorizationCookie(HttpResponse Response)
+        {
+            Response.Cookies.Delete(_config["Cookie:AuthToken"]);
+        }
+
+        public void DeleteRefreshAuthorizationCookie(HttpResponse Response)
+        {
+            Response.Cookies.Delete(_config["Cookie:RefreshToken"]);
         }
     }
 }

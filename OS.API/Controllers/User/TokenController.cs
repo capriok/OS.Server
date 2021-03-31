@@ -14,16 +14,16 @@ using System.Threading.Tasks;
 namespace OS.API.Controllers.User
 {
     [ApiController]
-    [Route(Routes.User.Refresh)]
+    [Route(Routes.User.Authentication)]
     [AllowAnonymous]
-    public class RefreshController : ControllerBase
+    public class TokenController : ControllerBase
     {
         private readonly IConfiguration _config;
         private readonly IUserManager _userManager;
         private readonly ITokenService _tokenService;
         private readonly ILogger _log;
 
-        public RefreshController(IConfiguration config, IUserManager userManager, ITokenService tokenService, ILogger<RefreshController> log)
+        public TokenController(IConfiguration config, IUserManager userManager, ITokenService tokenService, ILogger<TokenController> log)
         {
             _config = config;
             _userManager = userManager;
@@ -34,7 +34,7 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<AuthResponse> RefreshAuthToken()
+        public ActionResult<AuthResponse> RefreshAuthorization()
         {
             Request.Cookies.TryGetValue(_config["Cookie:Username"], out var usernameCookie);
             Request.Cookies.TryGetValue(_config["Cookie:RefreshToken"], out var refreshTokenCookie);
@@ -55,17 +55,39 @@ namespace OS.API.Controllers.User
 
             _log.LogInformation("Attempt Valid, Granting Tokens");
 
-            var authedUser = new UserModel
+            var authedUser = new UserModel(authEntity.Id)
             {
-                Id = authEntity.Id,
                 Username = authEntity.Username
             };
 
             _tokenService.GrantAuthorizationTokens(Response, authedUser);
 
-            return Ok( new AuthResponse
+            return Ok(new AuthResponse(authedUser.Id)
             {
-                User = authedUser.Id,
+                LastLogin = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm"),
+            });
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<AuthResponse> RevokeAuthorization([FromBody] UserModel user)
+        {
+            Request.Cookies.TryGetValue(_config["Cookie:Username"], out var usernameCookie);
+
+            var authEntity = _userManager.GetOneAuthDetails(usernameCookie);
+
+            if (authEntity is null)
+            {
+                return BadRequest();
+            }
+
+            _log.LogInformation($"Revoking Authorization for: {usernameCookie}");
+
+            _tokenService.RevokeAuthorizationTokens(Response, user);
+
+            return Ok(new AuthResponse(user.Id)
+            {
                 LastLogin = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm"),
             });
         }

@@ -7,8 +7,13 @@ namespace OS.API.Models.User
 {
     public class UserModel
     {
+        public UserModel(int id)
+        {
+            Id = id;
+        }
+
         public int Id { get; set; }
-        public string Username{ get; set; }
-        public DateTime JoinDate{ get; set; }
+        public string Username { get; set; }
+        public DateTime JoinDate { get; set; }
     }
 }

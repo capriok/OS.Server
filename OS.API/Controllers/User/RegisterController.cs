@@ -33,7 +33,7 @@ namespace OS.API.Controllers.User
                 return Conflict();
             }
 
-            var newUser = new AuthModel
+            var newUser = new AuthModel(reqEntity.Id)
             {
                 Username = reqEntity.Username,
                 Password = reqEntity.Password
@@ -41,10 +41,7 @@ namespace OS.API.Controllers.User
 
             var createdUser = await _userManager.CreateAsync(newUser);
 
-            var response = new AuthResponse
-            {
-                User = createdUser.Id,
-            };
+            var response = new AuthResponse(createdUser.Id);
 
             return Created(createdUser.Id.ToString(), response);
         }

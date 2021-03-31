@@ -7,7 +7,11 @@ namespace OS.API.Models.User
 {
     public class AuthResponse
     {
+        public AuthResponse(int id)
+        {
+            User = id;
+        }
         public int User { get; set; }
-        public string LastLogin{ get; set; }
+        public string LastLogin { get; set; }
     }
 }

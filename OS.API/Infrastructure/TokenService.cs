@@ -28,6 +28,28 @@ namespace OS.API.Infrastructure
             _cookieService = cookieService;
         }
 
+        public void GrantAuthorizationTokens(HttpResponse Response, UserModel user)
+        {
+            _cookieService.AppendUsernameCookie(Response, user.Username);
+
+            var authorizationToken = GenerateAuthorizationToken(user.Username);
+            _cookieService.AppendAuthorizationCookie(Response, authorizationToken);
+
+            var refreshToken = GenerateAuthorizationRefreshToken();
+            _cookieService.AppendAuthorizationRefreshCookie(Response, refreshToken);
+
+            UpdateUserRefreshToken(user, refreshToken);
+        }
+
+        public void RevokeAuthorizationTokens(HttpResponse Response, UserModel user)
+        {
+            _cookieService.DeleteUsernameCookie(Response);
+            _cookieService.DeleteAuthorizationCookie(Response);
+            _cookieService.DeleteAuthorizationCookie(Response);
+
+            UpdateUserRefreshToken(user, "");
+        }
+
         private string GenerateAuthorizationToken(string username)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
@@ -50,42 +72,17 @@ namespace OS.API.Infrastructure
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private string GenerateAuthorizationRefreshToken()
+        private static string GenerateAuthorizationRefreshToken()
         {
             return Guid.NewGuid().ToString();
         }
 
-        private void GrantUsernameToken(HttpResponse Response, string username)
+        private async void UpdateUserRefreshToken(UserModel user, string updatedToken)
         {
-            _cookieService.AppendUsernameCookie(Response, username);
-        }
-
-        public void GrantAuthorizationTokens(HttpResponse Response, UserModel user)
-        {
-            GrantUsernameToken(Response, user.Username);
-            GrantJWTAuthToken(Response, user.Username);
-            GrantAuthorizationRefreshToken(Response, user.Id);
-        }
-
-        private void GrantJWTAuthToken(HttpResponse Response, string username)
-        {
-            var authorizationToken = GenerateAuthorizationToken(username);
-
-            _cookieService.AppendAuthorizationCookie(Response, authorizationToken);
-        }
-
-        private void GrantAuthorizationRefreshToken(HttpResponse Response, int id)
-        {
-            var refreshToken = GenerateAuthorizationRefreshToken();
-
-            var user = new UpdateModel
+            await _userManager.UpdateAsync(new UpdateModel(user.Id)
             {
-                Id = id,
-                RefreshToken = refreshToken,
-            };
-
-            _userManager.UpdateAsync(user);
-            _cookieService.AppendAuthorizationRefreshCookie(Response, refreshToken);
+                RefreshToken = updatedToken
+            });
         }
     }
 }

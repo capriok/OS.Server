@@ -20,6 +20,7 @@ namespace OS.API
         {
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICookieService, CookieService>();
+            services.AddScoped<IDateService, DateService>();
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOversiteManager, OversiteManager>();

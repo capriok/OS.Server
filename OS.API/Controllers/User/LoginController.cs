@@ -19,11 +19,13 @@ namespace OS.API.Controllers.User
     {
         private readonly IUserManager _userManager;
         private readonly ITokenService _tokenService;
+        private readonly IDateService _dateService;
 
-        public LoginController(IUserManager userManager, ITokenService tokenService)
+        public LoginController(IUserManager userManager, ITokenService tokenService, IDateService dateService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _dateService = dateService;
         }
 
         [HttpPost]
@@ -44,18 +46,16 @@ namespace OS.API.Controllers.User
                 return Conflict();
             }
 
-            var authedUser = new UserModel
+            var authedUser = new UserModel(authEntity.Id)
             {
-                Id = authEntity.Id,
                 Username = authEntity.Username
             };
 
             _tokenService.GrantAuthorizationTokens(Response, authedUser);
 
-            var response = new AuthResponse
+            var response = new AuthResponse(authedUser.Id)
             {
-                User = authedUser.Id,
-                LastLogin = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm"),
+                LastLogin = _dateService.LastLogin()
             };
 
             return Ok(response);

@@ -46,7 +46,7 @@ namespace OS.API
 
                         if (context.Request.Cookies.ContainsKey(Configuration["Cookie:AuthToken"]))
                         {
-                            context.Token = context.Request.Cookies[Configuration["Cookie:Username"]];
+                            context.Token = context.Request.Cookies[Configuration["Cookie:AuthToken"]];
                         }
 
                         if (context.Request.Cookies.ContainsKey(Configuration["Cookie:RefreshToken"]))

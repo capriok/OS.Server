@@ -15,7 +15,7 @@ namespace OS.API.Controllers
             public const string OneUser = Root + "/user";
             public const string Login = Root + "/login";
             public const string Register = Root + "/register";
-            public const string Refresh = Root + "/refreshAccessToken";
+            public const string Authentication = Root + "/authentication";
         }
 
         public static class Oversite

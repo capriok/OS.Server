@@ -52,9 +52,8 @@ namespace OS.API.Controllers.User
                 return NotFound();
             }
 
-            var updateModel = new UpdateModel
+            var updateModel = new UpdateModel(reqMatch.Id)
             {
-                Id = reqMatch.Id,
                 Username = reqEntity.Username,
                 Password = reqMatch.Password
             };
