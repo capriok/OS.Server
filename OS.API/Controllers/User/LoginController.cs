@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace OS.API.Controllers.User
 {
@@ -17,12 +18,14 @@ namespace OS.API.Controllers.User
 
     public class LoginController : ControllerBase
     {
+        private readonly ILogger<LoginController> _logger;
         private readonly IUserManager _userManager;
         private readonly ITokenService _tokenService;
         private readonly IDateService _dateService;
 
-        public LoginController(IUserManager userManager, ITokenService tokenService, IDateService dateService)
+        public LoginController(ILogger<LoginController> logger, IUserManager userManager, ITokenService tokenService, IDateService dateService)
         {
+            _logger = logger;
             _userManager = userManager;
             _tokenService = tokenService;
             _dateService = dateService;
@@ -51,7 +54,9 @@ namespace OS.API.Controllers.User
                 Username = authEntity.Username
             };
 
-            _tokenService.GrantAuthorizationTokens(Response, authedUser);
+            _tokenService.GrantAuthenticationTokens(Response, authedUser);
+
+            _logger.LogInformation($"(Login) User Authenticated: {authEntity.Id}");
 
             var response = new AuthResponse(authedUser.Id)
             {

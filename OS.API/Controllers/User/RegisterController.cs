@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OS.API.Models.User;
 using OS.API.Services.Interfaces;
 using System;
@@ -15,12 +16,14 @@ namespace OS.API.Controllers.User
     [AllowAnonymous]
     public class RegisterController : ControllerBase
     {
+        private readonly ILogger<RegisterController> _logger;
         private readonly IUserManager _userManager;
 
-        public RegisterController(IUserManager userManager)
+        public RegisterController(ILogger<RegisterController> logger, IUserManager userManager)
         {
+            _logger = logger;
             _userManager = userManager;
-        }
+            }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -40,6 +43,8 @@ namespace OS.API.Controllers.User
             };
 
             var createdUser = await _userManager.CreateAsync(newUser);
+
+            _logger.LogInformation($"(Register) User Created: {createdUser.Id}");
 
             var response = new AuthResponse(createdUser.Id);
 

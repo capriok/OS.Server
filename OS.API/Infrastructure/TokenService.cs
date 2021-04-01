@@ -28,26 +28,28 @@ namespace OS.API.Infrastructure
             _cookieService = cookieService;
         }
 
-        public void GrantAuthorizationTokens(HttpResponse Response, UserModel user)
+        public async Task GrantAuthenticationTokens(HttpResponse Response, UserModel user)
         {
             _cookieService.AppendUsernameCookie(Response, user.Username);
 
             var authorizationToken = GenerateAuthorizationToken(user.Username);
-            _cookieService.AppendAuthorizationCookie(Response, authorizationToken);
+            _cookieService.AppendAuthenticationCookie(Response, authorizationToken);
 
             var refreshToken = GenerateAuthorizationRefreshToken();
-            _cookieService.AppendAuthorizationRefreshCookie(Response, refreshToken);
+            _cookieService.AppendRefreshAuthenticationCookie(Response, refreshToken);
 
-            UpdateUserRefreshToken(user, refreshToken);
+            await _userManager.UpdateAsync(new UpdateModel(user.Id)
+            {
+                RefreshToken = refreshToken
+            });
         }
 
-        public void RevokeAuthorizationTokens(HttpResponse Response, UserModel user)
+
+        public void RevokeAuthenticationRefreshTokens(HttpResponse Response)
         {
             _cookieService.DeleteUsernameCookie(Response);
-            _cookieService.DeleteAuthorizationCookie(Response);
-            _cookieService.DeleteAuthorizationCookie(Response);
-
-            UpdateUserRefreshToken(user, "");
+            _cookieService.DeleteAuthenticationCookie(Response);
+            _cookieService.DeleteRefreshAuthenticationCookie(Response);
         }
 
         private string GenerateAuthorizationToken(string username)
@@ -75,14 +77,6 @@ namespace OS.API.Infrastructure
         private static string GenerateAuthorizationRefreshToken()
         {
             return Guid.NewGuid().ToString();
-        }
-
-        private async void UpdateUserRefreshToken(UserModel user, string updatedToken)
-        {
-            await _userManager.UpdateAsync(new UpdateModel(user.Id)
-            {
-                RefreshToken = updatedToken
-            });
         }
     }
 }

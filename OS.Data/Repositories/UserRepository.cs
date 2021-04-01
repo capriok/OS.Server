@@ -28,7 +28,7 @@ namespace OS.Data.Repositories
 
         public UserEntity FindByUsername(string username)
         {
-            return GetQueryable()
+            return _osContext.Users.AsQueryable()
                 .Where(u => u.Username.Equals(username))
                 .FirstOrDefault();
         }

@@ -28,7 +28,7 @@ namespace OS.API.Services
         {
             _logger = logger;
             _userRepository = userRepository;
-            _dateService= dateService;
+            _dateService = dateService;
         }
 
         public async Task<List<UserModel>> GetAllAsync()
@@ -111,8 +111,6 @@ namespace OS.API.Services
         {
             var userEntity = await _userRepository.FindByIdAsync(updateModel.Id);
 
-            _logger.LogInformation("User Entity Being Modified");
-
             userEntity.Username = userEntity.Username;
             userEntity.JoinDate = userEntity.JoinDate;
             userEntity.Password = userEntity.Password;
@@ -132,7 +130,7 @@ namespace OS.API.Services
             await _userRepository.RemoveAsync(Id);
         }
 
-        private string UseUpdatedValue( string currValue, string newValue)
+        private string UseUpdatedValue(string currValue, string newValue)
         {
             if (currValue is null)
             {
@@ -153,8 +151,6 @@ namespace OS.API.Services
             {
                 return currValue;
             }
-
         }
     }
 }
-;

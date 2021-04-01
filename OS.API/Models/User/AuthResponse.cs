@@ -9,9 +9,10 @@ namespace OS.API.Models.User
     {
         public AuthResponse(int id)
         {
-            User = id;
+            Id = id;
         }
-        public int User { get; set; }
+
+        public int Id { get; set; }
         public string LastLogin { get; set; }
     }
 }
