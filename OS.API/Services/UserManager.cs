@@ -136,6 +136,7 @@ namespace OS.API.Services
             {
                 return newValue;
             }
+            
             if (!newValue.Equals(""))
             {
                 return currValue;
