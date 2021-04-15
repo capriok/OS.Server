@@ -43,10 +43,14 @@ namespace OS.API.Infrastructure
             await _RefreshTokenManager.UpdateAsync(oldToken.Token, newToken);
         }
 
-        public void RevokeAuthenticationRefreshTokens(HttpResponse Response)
+        public async Task RevokeAuthenticationRefreshTokens(HttpResponse Response, string oldToken)
         {
             _CookieService.DeleteAuthenticationCookie(Response);
             _CookieService.DeleteRefreshAuthenticationCookie(Response);
+
+            var revokedToken = GenerateRevokedAuthRefreshToken();
+
+            await _RefreshTokenManager.UpdateAsync(oldToken, revokedToken);
         }
 
         private string GenerateAuthenticationToken(string username)
@@ -76,6 +80,14 @@ namespace OS.API.Infrastructure
             return new RefreshTokenModel
             {
                 Token = Guid.NewGuid().ToString()
+            };
+        }
+
+        private static RefreshTokenModel GenerateRevokedAuthRefreshToken()
+        {
+            return new RefreshTokenModel
+            {
+                Token = ""
             };
         }
     }

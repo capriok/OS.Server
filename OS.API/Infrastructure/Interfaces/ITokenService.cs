@@ -10,6 +10,6 @@ namespace OS.API.Infrastructure.Interfaces
     public interface ITokenService
     {
         Task IssueAuthenticationTokens(HttpResponse Response, UserModel user);
-        void RevokeAuthenticationRefreshTokens(HttpResponse Response);
+        Task RevokeAuthenticationRefreshTokens(HttpResponse Response, string oldToken);
     }
 }

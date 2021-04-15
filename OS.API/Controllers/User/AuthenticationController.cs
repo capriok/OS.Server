@@ -46,9 +46,6 @@ namespace OS.API.Controllers.User
 
             _Logger.LogInformation($"Refresh Token: {refreshTokenCookie}");
 
-            //await _TokenService.IssueAuthenticationTokens(Response, new UserModel(1) { Username = "kyle"});
-            //return Ok(new AuthResponse(1) {LastLogin = _DateService.LastLogin()});
-
             if (refreshTokenCookie is null)
             {
                 return BadRequest();
@@ -58,18 +55,15 @@ namespace OS.API.Controllers.User
 
             if (dbEntity is null)
             {
-                _TokenService.RevokeAuthenticationRefreshTokens(Response);
+                _TokenService.RevokeAuthenticationRefreshTokens(Response, refreshTokenCookie);
                 return Unauthorized();
             }
-
-            _Logger.LogInformation(dbEntity.Token.ToString());
-            _Logger.LogInformation(dbEntity.UserId.ToString());
 
             if (!dbEntity.Token.Equals(refreshTokenCookie))
             {
                 return Unauthorized();
             }
-             
+
             var authedUser = await _UserManager.GetModelAsync(dbEntity.UserId);
 
             await _TokenService.IssueAuthenticationTokens(Response, authedUser);
@@ -90,24 +84,24 @@ namespace OS.API.Controllers.User
         {
             Request.Cookies.TryGetValue(_Config["Cookie:RefreshToken"], out var refreshTokenCookie);
 
-            //_TokenService.RevokeAuthenticationRefreshTokens(Response);
-            //return Ok();
+            var dbToken = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
 
-            var dbEntity = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
+            _Logger.LogInformation($"REVOKE, req {request.Id}");
+            _Logger.LogInformation($"REVOKE, db {dbToken.UserId}");
 
-            if (dbEntity is null)
+            if (dbToken is null)
             {
                 return BadRequest();
             }
 
-            if (!dbEntity.UserId.Equals(request.Id))
+            if (dbToken.UserId.Equals(request.Id))
             {
                 return Conflict();
             }
 
-            _TokenService.RevokeAuthenticationRefreshTokens(Response);
+            _TokenService.RevokeAuthenticationRefreshTokens(Response, refreshTokenCookie);
 
-            _Logger.LogInformation($"(Token) Revoked User Authentication: {dbEntity.UserId}");
+            _Logger.LogInformation($"(Token) Revoked User Authentication: {dbToken.UserId}");
 
             return Ok();
         }
