@@ -9,9 +9,9 @@ namespace OS.API
 {
     public class CorsInstaller
     {
-        public CorsInstaller(IServiceCollection services, IConfiguration Configuration)
+        public CorsInstaller(IServiceCollection Services, IConfiguration Configuration)
         {
-            services.AddCors(o => o.AddPolicy(Configuration["Cors:Policy"], builder =>
+            Services.AddCors(o => o.AddPolicy(Configuration["Cors:Policy"], builder =>
             {
                 builder
                 .WithOrigins(Configuration["Cors:Origins"])

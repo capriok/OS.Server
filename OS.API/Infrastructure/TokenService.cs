@@ -11,50 +11,49 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OS.API.Services;
+using OS.API.Models.RefreshToken;
 
 namespace OS.API.Infrastructure
 {
     public class TokenService : ITokenService
     {
 
-        private readonly IConfiguration _config;
-        private readonly IUserManager _userManager;
-        private readonly ICookieService _cookieService;
+        private readonly IConfiguration _Config;
+        private readonly IRefreshTokenManager _RefreshTokenManager;
+        private readonly ICookieService _CookieService;
 
-        public TokenService(IConfiguration config, IUserManager userManager, ICookieService cookieService)
+        public TokenService(IConfiguration config, IRefreshTokenManager refreshTokenManager, ICookieService cookieService)
         {
-            _config = config;
-            _userManager = userManager;
-            _cookieService = cookieService;
+            _Config = config;
+            _RefreshTokenManager = refreshTokenManager;
+            _CookieService = cookieService;
         }
 
-        public async Task GrantAuthenticationTokens(HttpResponse Response, UserModel user)
+        public async Task IssueAuthenticationTokens(HttpResponse Response, UserModel user)
         {
-            _cookieService.AppendUsernameCookie(Response, user.Username);
+            var authorizationToken = GenerateAuthenticationToken(user.Username);
+            _CookieService.AppendAuthenticationCookie(Response, authorizationToken);
 
-            var authorizationToken = GenerateAuthorizationToken(user.Username);
-            _cookieService.AppendAuthenticationCookie(Response, authorizationToken);
+            var refreshToken = GenerateAuthenticationRefreshToken();
+            _CookieService.AppendRefreshAuthenticationCookie(Response, refreshToken);
 
-            var refreshToken = GenerateAuthorizationRefreshToken();
-            _cookieService.AppendRefreshAuthenticationCookie(Response, refreshToken);
-
-            await _userManager.UpdateAsync(new UpdateModel(user.Id)
+            await _RefreshTokenManager.UpdateAsync(new RefreshTokenModel
             {
-                RefreshToken = refreshToken
+                Token = refreshToken
             });
         }
 
 
         public void RevokeAuthenticationRefreshTokens(HttpResponse Response)
         {
-            _cookieService.DeleteUsernameCookie(Response);
-            _cookieService.DeleteAuthenticationCookie(Response);
-            _cookieService.DeleteRefreshAuthenticationCookie(Response);
+            _CookieService.DeleteAuthenticationCookie(Response);
+            _CookieService.DeleteRefreshAuthenticationCookie(Response);
         }
 
-        private string GenerateAuthorizationToken(string username)
+        private string GenerateAuthenticationToken(string username)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_Config["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var tokenClaims = new[] {
@@ -64,8 +63,8 @@ namespace OS.API.Infrastructure
             };
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: _Config["Jwt:Issuer"],
+                audience: _Config["Jwt:Audience"],
                 claims: tokenClaims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: credentials
@@ -74,7 +73,7 @@ namespace OS.API.Infrastructure
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private static string GenerateAuthorizationRefreshToken()
+        private static string GenerateAuthenticationRefreshToken()
         {
             return Guid.NewGuid().ToString();
         }

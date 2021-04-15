@@ -15,50 +15,51 @@ namespace OS.API.Controllers.User
     [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly IUserManager _userManager;
+        private readonly IUserManager _UserManager;
 
         public UserController(IUserManager userManager)
         {
-            _userManager = userManager;
+            _UserManager = userManager;
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserModel>> GetUserAsync([FromRoute] int id)
+        public async Task<ActionResult<UserModel>> GetUserAsync([FromRoute] int userId)
         {
-            var reqMatch = await _userManager.GetOneModelAsync(id);
-            if (reqMatch is null)
+            var dbUser = await _UserManager.GetModelAsync(userId);
+            if (dbUser is null)
             {
                 return NotFound();
             }
-            return Ok(reqMatch);
+            return Ok(dbUser);
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUserAsync([FromRoute] int id, [FromBody] UpdateModel reqEntity)
+        public async Task<IActionResult> UpdateUserAsync([FromRoute] int userId, [FromBody] UpdateModel user)
         {
-            if (id != reqEntity.Id)
+            var dbUser = await _UserManager.GetModelAsync(userId);
+            if (userId != dbUser.Id)
             {
                 return BadRequest();
             }
 
-            var reqMatch = await _userManager.GetOneEntityAsync(id);
-            if (reqMatch is null)
+            var dbUbserAuth = _UserManager.GetAuthDetails(dbUser.Username);
+            if (dbUbserAuth is null)
             {
                 return NotFound();
             }
 
-            var updateModel = new UpdateModel(reqMatch.Id)
+            var updateModel = new UpdateModel(dbUbserAuth.Id)
             {
-                Username = reqEntity.Username,
-                Password = reqMatch.Password
+                Username = user.Username,
+                Password = dbUbserAuth.Password
             };
 
-            await _userManager.UpdateAsync(updateModel);
+            await _UserManager.UpdateAsync(updateModel);
 
             return NoContent();
         }
@@ -67,21 +68,21 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteUserAsync([FromRoute] int id, [FromBody] UserModel reqEntity)
+        public async Task<IActionResult> DeleteUserAsync([FromRoute] int userId, [FromBody] UserModel user)
         {
-            if (id != reqEntity.Id)
+            if (userId != user.Id)
             {
                 return BadRequest();
             }
 
-            var reqMatch = await _userManager.GetOneModelAsync(id);
+            var dbUser = await _UserManager.GetModelAsync(userId);
 
-            if (reqMatch is null)
+            if (dbUser is null)
             {
                 return NotFound();
             }
 
-            await _userManager.DeleteUserAsync(id);
+            await _UserManager.DeleteAsync(userId);
 
             return NoContent();
         }

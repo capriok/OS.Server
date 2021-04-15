@@ -10,7 +10,7 @@ namespace OS.API.Services.Interfaces
     public interface IOversiteManager
     {
         Task<List<OversiteModel>> GetAllAsync();
-        Task<OversiteEntity> GetOneEntityAsync(int Id);
+        Task<OversiteEntity> GetEntityAsync(int id);
 
     }
 }

@@ -18,49 +18,49 @@ namespace OS.API.Controllers.User
 
     public class LoginController : ControllerBase
     {
-        private readonly ILogger<LoginController> _logger;
-        private readonly IUserManager _userManager;
-        private readonly ITokenService _tokenService;
-        private readonly IDateService _dateService;
+        private readonly ILogger<LoginController> _Logger;
+        private readonly IUserManager _UserManager;
+        private readonly ITokenService _TokenService;
+        private readonly IDateService _DateService;
 
         public LoginController(ILogger<LoginController> logger, IUserManager userManager, ITokenService tokenService, IDateService dateService)
         {
-            _logger = logger;
-            _userManager = userManager;
-            _tokenService = tokenService;
-            _dateService = dateService;
+            _Logger = logger;
+            _UserManager = userManager;
+            _TokenService = tokenService;
+            _DateService = dateService;
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<AuthResponse> LoginUserAsync([FromBody] AuthModel reqEntity)
+        public ActionResult<AuthResponse> LoginUserAsync([FromBody] AuthModel request)
         {
-            var authEntity = _userManager.GetOneAuthDetails(reqEntity.Username);
+            var dbUser = _UserManager.GetAuthDetails(request.Username);
 
-            if (authEntity is null)
+            if (dbUser is null)
             {
                 return Unauthorized();
             }
 
-            if (!authEntity.Password.Equals(reqEntity.Password))
+            if (!dbUser.Password.Equals(request.Password))
             {
                 return Conflict();
             }
 
-            var authedUser = new UserModel(authEntity.Id)
+            var authedUser = new UserModel(dbUser.Id)
             {
-                Username = authEntity.Username
+                Username = dbUser.Username
             };
 
-            _tokenService.GrantAuthenticationTokens(Response, authedUser);
+            _TokenService.IssueAuthenticationTokens(Response, authedUser);
 
-            _logger.LogInformation($"(Login) User Authenticated: {authEntity.Id}");
+            _Logger.LogInformation($"(Login) User Authenticated: {dbUser.Id}");
 
             var response = new AuthResponse(authedUser.Id)
             {
-                LastLogin = _dateService.LastLogin()
+                LastLogin = _DateService.LastLogin()
             };
 
             return Ok(response);

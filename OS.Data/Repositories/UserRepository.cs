@@ -5,7 +5,6 @@ using OS.Data.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,66 +12,66 @@ namespace OS.Data.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ILogger<UserRepository> _logger;
-        private readonly OSContext _osContext;
+        private readonly ILogger<UserRepository> _Logger;
+        private readonly OSContext _OSContext;
         public UserRepository(ILogger<UserRepository> logger, OSContext osContext)
         {
-            _logger = logger;
-            _osContext = osContext;
+            _Logger = logger;
+            _OSContext = osContext;
         }
 
         public IQueryable<UserEntity> GetQueryable()
         {
-            return _osContext.Users.AsQueryable();
+            return _OSContext.Users.AsQueryable();
         }
 
         public UserEntity FindByUsername(string username)
         {
-            return _osContext.Users.AsQueryable()
+            return _OSContext.Users.AsQueryable()
                 .Where(u => u.Username.Equals(username))
                 .FirstOrDefault();
         }
 
         public async Task<UserEntity> FindByIdAsync(int id)
         {
-            return await _osContext.Users.FindAsync(id);
+            return await _OSContext.Users.FindAsync(id);
         }
 
         public async Task<UserEntity> AddAsync(UserEntity user)
         {
-            _osContext.Users.Add(user);
-            await _osContext.SaveChangesAsync();
+            await _OSContext.Users.AddAsync(user);
+            await _OSContext.SaveChangesAsync();
 
-            _logger.LogInformation($"(Repository) User Added: {user.Id}");
+            _Logger.LogInformation($"(Repository) User Added: {user.Id}");
 
             return user;
         }
 
         public async Task<UserEntity> UpdateAsync(UserEntity user)
         {
-            var local = _osContext.Users.Local.FirstOrDefault(entity => entity.Id == user.Id);
+            var local = _OSContext.Users.Local.FirstOrDefault(entity => entity.Id == user.Id);
             if (local is not null)
             {
-                _osContext.Entry(local).State = EntityState.Detached;
+                _OSContext.Entry(local).State = EntityState.Detached;
             }
 
-            _osContext.Entry(user).State = EntityState.Modified;
-            await _osContext.SaveChangesAsync();
+            _OSContext.Entry(user).State = EntityState.Modified;
+            await _OSContext.SaveChangesAsync();
 
-            _logger.LogInformation($"(Repository) User Updated: {user.Id}");
+            _Logger.LogInformation($"(Repository) User Updated: {user.Id}");
 
             return user;
         }
 
-        public async Task RemoveAsync(int id)
+        public async Task RemoveAsync(int userId)
         {
-            var user = await _osContext.Users.FindAsync(id);
+            var user = await _OSContext.Users.FindAsync(userId);
             if (user is not null)
             {
-                _osContext.Users.Remove(user);
-                await _osContext.SaveChangesAsync();
+                _OSContext.Users.Remove(user);
+                await _OSContext.SaveChangesAsync();
             }
-            _logger.LogInformation($"(Repository) User Removed: {id}");
+            _Logger.LogInformation($"(Repository) User Removed: {userId}");
         }
     }
 }

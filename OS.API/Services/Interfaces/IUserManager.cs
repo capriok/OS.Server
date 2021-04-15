@@ -10,11 +10,10 @@ namespace OS.API.Services.Interfaces
     public interface IUserManager
     {
         Task<List<UserModel>> GetAllAsync();
-        AuthModel GetOneAuthDetails(string Username);
-        Task<UserEntity> GetOneEntityAsync(int Id);
-        Task<UserModel> GetOneModelAsync(int Id);
+        AuthModel GetAuthDetails(string Username);
+        Task<UserModel> GetModelAsync(int id);
         Task<UserModel> CreateAsync(AuthModel user);
         Task<UserModel> UpdateAsync(UpdateModel user);
-        Task DeleteUserAsync(int Id);
+        Task DeleteAsync(int userId);
     }
 }

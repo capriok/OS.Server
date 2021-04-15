@@ -15,18 +15,18 @@ namespace OS.API.Controllers.User
     [AllowAnonymous]
     public class UsersController : ControllerBase
     {
-        private readonly IUserManager _userManager;
+        private readonly IUserManager _UserManager;
 
         public UsersController(IUserManager userManager)
         {
-            _userManager = userManager;
+            _UserManager = userManager;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<UserModel>>> GetUsersAsync()
         {
-            var allUsers = await _userManager.GetAllAsync();
+            var allUsers = await _UserManager.GetAllAsync();
 
             return Ok(allUsers);
         }

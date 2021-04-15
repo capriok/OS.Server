@@ -10,9 +10,9 @@ namespace OS.API
 {
     public class SwaggerInstaller
     {
-        public SwaggerInstaller(IServiceCollection services, IConfiguration Configuration)
+        public SwaggerInstaller(IServiceCollection Services, IConfiguration Configuration)
         {
-            services.AddSwaggerGen(c =>
+            Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Oversites API", Version = "v1" });
             });

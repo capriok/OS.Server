@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace OS.Data.Entities
 {
-    public class UserEntity : IUserEntity
+    public class ProofEntity : IProofEntity
     {
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public DateTime JoinDate { get; set; }
+        public string Blob { get; set; }
+        public int OversiteId { get; set; }
     }
 }

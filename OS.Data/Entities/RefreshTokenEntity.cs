@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace OS.Data.Entities
 {
-    public class OversiteEntity : IOversiteEntity
+    public class RefreshTokenEntity : IRefreshTokenEntity
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Website { get; set; }
-        public string Category { get; set; }
-        public string Severity { get; set; }
+        public string Token { get; set; }
         public int UserId { get; set; }
     }
 }

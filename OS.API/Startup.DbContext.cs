@@ -12,9 +12,9 @@ namespace OS.API
 {
     public class DbContextInstaller
     {
-        public DbContextInstaller(IServiceCollection services, IConfiguration Configuration)
+        public DbContextInstaller(IServiceCollection Services, IConfiguration Configuration)
         {
-            services.AddDbContext<OSContext>(
+            Services.AddDbContext<OSContext>(
                 contextOptions => contextOptions.UseMySql(
                     Configuration.GetConnectionString("DefaultConnection"),
                     new MySqlServerVersion(new Version(8, 0, 23)),

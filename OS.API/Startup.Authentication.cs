@@ -12,9 +12,9 @@ namespace OS.API
 {
     public class AuthenticationInstaller
     {
-        public AuthenticationInstaller(IServiceCollection services, IConfiguration Configuration)
+        public AuthenticationInstaller(IServiceCollection Services, IConfiguration Configuration)
         {
-            services
+            Services
             .AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -39,20 +39,11 @@ namespace OS.API
                 {
                     OnMessageReceived = context =>
                     {
-                        if (context.Request.Cookies.ContainsKey(Configuration["Cookie:Username"]))
-                        {
-                            context.Token = context.Request.Cookies[Configuration["Cookie:Username"]];
-                        }
-
                         if (context.Request.Cookies.ContainsKey(Configuration["Cookie:AuthToken"]))
                         {
                             context.Token = context.Request.Cookies[Configuration["Cookie:AuthToken"]];
                         }
 
-                        if (context.Request.Cookies.ContainsKey(Configuration["Cookie:RefreshToken"]))
-                        {
-                            context.Token = context.Request.Cookies[Configuration["Cookie:RefreshToken"]];
-                        }
                         return Task.CompletedTask;
                     }
                 };

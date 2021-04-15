@@ -9,7 +9,7 @@ namespace OS.API.Infrastructure.Interfaces
 {
     public interface ITokenService
     {
-        Task GrantAuthenticationTokens(HttpResponse Response, UserModel user);
+        Task IssueAuthenticationTokens(HttpResponse Response, UserModel user);
         void RevokeAuthenticationRefreshTokens(HttpResponse Response);
     }
 }

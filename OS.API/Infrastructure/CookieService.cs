@@ -9,59 +9,55 @@ using System.Threading.Tasks;
 
 namespace OS.API.Infrastructure
 {
-    class CookieOps : CookieOptions
+    public class CookieOps : CookieOptions
     {
         public CookieOps()
         {
             Secure = true;
             HttpOnly = true;
             SameSite = SameSiteMode.None;
-            //SameSite = _env.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict
+            //SameSite = _Env.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict
         }
     }
 
     public class CookieService : ICookieService
     {
-        private readonly IWebHostEnvironment _env;
-        private readonly IConfiguration _config;
-        public CookieService(IWebHostEnvironment env, IConfiguration config)
+        private readonly IConfiguration _Config;
+        public CookieService(IConfiguration config)
         {
-            _env = env;
-            _config = config;
+            _Config = config;
         }
 
-        private readonly string usernameCookie = "Cookie:Username";
         private readonly string AuthTokenCookie = "Cookie:AuthToken";
         private readonly string RefreshTokenCookie = "Cookie:RefreshToken";
 
-        public void AppendUsernameCookie(HttpResponse Response, string username)
-        {
-            Response.Cookies.Append(_config[usernameCookie], username,new CookieOps());
-        }
 
         public void AppendAuthenticationCookie(HttpResponse Response, string accessToken)
         {
-            Response.Cookies.Append(_config[AuthTokenCookie], accessToken,new CookieOps());
+            Response.Cookies.Append(_Config[AuthTokenCookie], accessToken, new CookieOps()
+            {
+                //Expires = DateTimeOffset.Now.AddMinutes(60)
+                Expires = DateTimeOffset.Now.AddSeconds(5)
+            });
         }
 
         public void AppendRefreshAuthenticationCookie(HttpResponse Response, string refreshToken)
         {
-            Response.Cookies.Append(_config[RefreshTokenCookie], refreshToken,new CookieOps());
-        }
-
-        public void DeleteUsernameCookie(HttpResponse Response)
-        {
-            Response.Cookies.Delete(_config[usernameCookie],new CookieOps());
+            Response.Cookies.Append(_Config[RefreshTokenCookie], refreshToken, new CookieOps()
+            {
+                HttpOnly = false,
+                Expires = DateTimeOffset.Now.AddDays(3)
+            });
         }
 
         public void DeleteAuthenticationCookie(HttpResponse Response)
         {
-            Response.Cookies.Delete(_config[AuthTokenCookie],new CookieOps());
+            Response.Cookies.Delete(_Config[AuthTokenCookie], new CookieOps());
         }
 
         public void DeleteRefreshAuthenticationCookie(HttpResponse Response)
         {
-            Response.Cookies.Delete(_config[RefreshTokenCookie], new CookieOps());
+            Response.Cookies.Delete(_Config[RefreshTokenCookie], new CookieOps());
         }
     }
 }

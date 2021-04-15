@@ -16,15 +16,17 @@ namespace OS.API
 {
     public class ScopeInstaller
     {
-        public ScopeInstaller(IServiceCollection services, IConfiguration Configuration)
+        public ScopeInstaller(IServiceCollection Services, IConfiguration Configuration)
         {
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<ICookieService, CookieService>();
-            services.AddScoped<IDateService, DateService>();
-            services.AddScoped<IUserManager, UserManager>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IOversiteManager, OversiteManager>();
-            services.AddScoped<IOversiteRepository, OversiteRepository>();
+            Services.AddScoped<ITokenService, TokenService>();
+            Services.AddScoped<ICookieService, CookieService>();
+            Services.AddScoped<IDateService, DateService>();
+            Services.AddScoped<IUserManager, UserManager>();
+            Services.AddScoped<IUserRepository, UserRepository>();
+            Services.AddScoped<IOversiteManager, OversiteManager>();
+            Services.AddScoped<IOversiteRepository, OversiteRepository>();
+            Services.AddScoped<IRefreshTokenManager, RefreshTokenManager>();
+            Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         }
     }
 }

@@ -21,9 +21,9 @@ namespace OS.Data.Repositories
             return _OSContext.Oversites.AsQueryable();
         }
 
-        public async Task<OversiteEntity> FindByIdAsync(int id)
+        public async Task<OversiteEntity> FindByIdAsync(int oversiteId)
         {
-            return await _OSContext.Oversites.FindAsync(id);
+            return await _OSContext.Oversites.FindAsync(oversiteId);
         }
 
     }

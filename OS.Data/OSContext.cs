@@ -12,6 +12,8 @@ namespace OS.Data
         public OSContext(DbContextOptions<OSContext> options) : base(options) { }
 
         public DbSet<UserEntity> Users { get; set; }
+        public DbSet<RefreshTokenEntity> RefreshTokens{ get; set; }
         public DbSet<OversiteEntity> Oversites { get; set; }
+        public DbSet<ProofEntity> Proofs{ get; set; }
     }
 }

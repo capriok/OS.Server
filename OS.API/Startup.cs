@@ -8,6 +8,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace OS.API
 {
@@ -51,6 +52,8 @@ namespace OS.API
             app.UseCors(_config["Cors:Policy"]);
 
             app.UseHttpsRedirection();
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 

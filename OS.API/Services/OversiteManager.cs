@@ -35,9 +35,9 @@ namespace OS.API.Services
             .ToListAsync();
         }
 
-        public async Task<OversiteEntity> GetOneEntityAsync(int Id)
+        public async Task<OversiteEntity> GetEntityAsync(int oversiteId)
         {
-            return await _oversiteRepository.FindByIdAsync(Id);
+            return await _oversiteRepository.FindByIdAsync(oversiteId);
         }
     }
 }

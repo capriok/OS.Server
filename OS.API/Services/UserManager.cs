@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using OS.API.Infrastructure.Interfaces;
 using OS.API.Models.User;
 using OS.API.Services.Interfaces;
@@ -9,31 +8,26 @@ using OS.Data.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace OS.API.Services
 {
-    public class TestModel
-    {
-        public int Idx { get; set; }
-    }
     public class UserManager : IUserManager
     {
-        private readonly ILogger<UserManager> _logger;
-        private readonly IUserRepository _userRepository;
-        private readonly IDateService _dateService;
+        private readonly ILogger<UserManager> _Logger;
+        private readonly IUserRepository _UserRepository;
+        private readonly IDateService _DateService;
 
         public UserManager(ILogger<UserManager> logger, IUserRepository userRepository, IDateService dateService)
         {
-            _logger = logger;
-            _userRepository = userRepository;
-            _dateService = dateService;
+            _Logger = logger;
+            _UserRepository = userRepository;
+            _DateService = dateService;
         }
 
         public async Task<List<UserModel>> GetAllAsync()
         {
-            IQueryable<UserEntity> query = _userRepository.GetQueryable();
+            IQueryable<UserEntity> query = _UserRepository.GetQueryable();
 
             return await query.Select(user => new UserModel(user.Id)
             {
@@ -43,9 +37,9 @@ namespace OS.API.Services
             .ToListAsync();
         }
 
-        public AuthModel GetOneAuthDetails(string Username)
+        public AuthModel GetAuthDetails(string Username)
         {
-            var userEntity = _userRepository.FindByUsername(Username);
+            var userEntity = _UserRepository.FindByUsername(Username);
 
             if (userEntity is null)
             {
@@ -55,26 +49,13 @@ namespace OS.API.Services
             return new AuthModel(userEntity.Id)
             {
                 Username = userEntity.Username,
-                Password = userEntity.Password,
-                RefreshToken = userEntity.RefreshToken
+                Password = userEntity.Password
             };
         }
 
-        public async Task<UserEntity> GetOneEntityAsync(int Id)
+        public async Task<UserModel> GetModelAsync(int userId)
         {
-            var userEntity = await _userRepository.FindByIdAsync(Id);
-
-            if (userEntity is null)
-            {
-                return null;
-            }
-
-            return userEntity;
-        }
-
-        public async Task<UserModel> GetOneModelAsync(int Id)
-        {
-            var userEntity = await _userRepository.FindByIdAsync(Id);
+            var userEntity = await _UserRepository.FindByIdAsync(userId);
 
             if (userEntity is null)
             {
@@ -90,15 +71,14 @@ namespace OS.API.Services
 
         public async Task<UserModel> CreateAsync(AuthModel authModel)
         {
-
             var userEntity = new UserEntity
             {
                 Username = authModel.Username,
                 Password = authModel.Password,
-                JoinDate = DateTime.Parse(_dateService.Now())
+                JoinDate = DateTime.Parse(_DateService.Now())
             };
 
-            var createdEntity = await _userRepository.AddAsync(userEntity);
+            var createdEntity = await _UserRepository.AddAsync(userEntity);
 
             return new UserModel(createdEntity.Id)
             {
@@ -109,14 +89,18 @@ namespace OS.API.Services
 
         public async Task<UserModel> UpdateAsync(UpdateModel updateModel)
         {
-            var userEntity = await _userRepository.FindByIdAsync(updateModel.Id);
+            var userEntity = await _UserRepository.FindByIdAsync(updateModel.Id);
 
-            userEntity.Username = userEntity.Username;
+            if (userEntity is null)
+            {
+                return null;
+            }
+
             userEntity.JoinDate = userEntity.JoinDate;
-            userEntity.Password = userEntity.Password;
-            userEntity.RefreshToken = UseUpdatedValue(userEntity.RefreshToken, updateModel.RefreshToken);
+            userEntity.Username = UseUpdatedValue(userEntity.Username, updateModel.Username);
+            userEntity.Password = UseUpdatedValue(userEntity.Password, updateModel.Password);
 
-            var updatedEntity = await _userRepository.UpdateAsync(userEntity);
+            var updatedEntity = await _UserRepository.UpdateAsync(userEntity);
 
             return new UserModel(updatedEntity.Id)
             {
@@ -125,31 +109,24 @@ namespace OS.API.Services
             };
         }
 
-        public async Task DeleteUserAsync(int Id)
+        public async Task DeleteAsync(int userId)
         {
-            await _userRepository.RemoveAsync(Id);
+            await _UserRepository.RemoveAsync(userId);
         }
 
         private string UseUpdatedValue(string currValue, string newValue)
         {
-            if (currValue is null)
-            {
-                return newValue;
-            }
-            if (!newValue.Equals(""))
-            {
-                return currValue;
-            }
-
             var valueModified = !currValue.Equals(newValue);
+
+            if (currValue.Equals("")  || currValue is null) return newValue;
+            if (newValue.Equals("") || newValue is null) return currValue;
 
             if (valueModified)
             {
-                return newValue;
-            }
-            else
-            {
                 return currValue;
+            } else
+            {
+                return newValue;
             }
         }
     }

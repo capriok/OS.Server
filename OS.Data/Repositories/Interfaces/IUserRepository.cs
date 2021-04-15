@@ -1,5 +1,4 @@
-﻿using OS.Data;
-using OS.Data.Entities;
+﻿using OS.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +13,6 @@ namespace OS.Data.Repositories.Interfaces
         Task<UserEntity> FindByIdAsync(int id);
         Task<UserEntity> AddAsync(UserEntity user);
         Task<UserEntity> UpdateAsync(UserEntity user);
-        Task RemoveAsync(int id);
+        Task RemoveAsync(int userId);
     }
 }

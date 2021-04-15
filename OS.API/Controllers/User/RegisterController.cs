@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OS.API.Models.RefreshToken;
 using OS.API.Models.User;
+using OS.API.Services;
 using OS.API.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,35 +18,39 @@ namespace OS.API.Controllers.User
     [AllowAnonymous]
     public class RegisterController : ControllerBase
     {
-        private readonly ILogger<RegisterController> _logger;
-        private readonly IUserManager _userManager;
+        private readonly ILogger<RegisterController> _Logger;
+        private readonly IUserManager _UserManager;
+        private readonly IRefreshTokenManager _RefreshTokenManager;
 
-        public RegisterController(ILogger<RegisterController> logger, IUserManager userManager)
+        public RegisterController(ILogger<RegisterController> logger, IUserManager userManager, IRefreshTokenManager refreshTokenManager)
         {
-            _logger = logger;
-            _userManager = userManager;
-            }
+            _Logger = logger;
+            _UserManager = userManager;
+            _RefreshTokenManager = refreshTokenManager;
+        }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<AuthResponse>> RegisterUserAsync([FromBody] AuthModel reqEntity)
+        public async Task<ActionResult<AuthResponse>> RegisterUserAsync([FromBody] AuthModel request)
         {
-            var authEntity = _userManager.GetOneAuthDetails(reqEntity.Username);
-            if (authEntity is not null)
+            var dbUser = _UserManager.GetAuthDetails(request.Username);
+            if (dbUser is not null)
             {
                 return Conflict();
             }
 
-            var newUser = new AuthModel(reqEntity.Id)
+            var createdUser = await _UserManager.CreateAsync(new AuthModel(request.Id)
             {
-                Username = reqEntity.Username,
-                Password = reqEntity.Password
-            };
+                Username = request.Username,
+                Password = request.Password
+            });
 
-            var createdUser = await _userManager.CreateAsync(newUser);
-
-            _logger.LogInformation($"(Register) User Created: {createdUser.Id}");
+             await _RefreshTokenManager.CreateAsync(new RefreshTokenModel
+            {
+                Token = Guid.NewGuid().ToString(),
+                UserId = createdUser.Id
+            });
 
             var response = new AuthResponse(createdUser.Id);
 
