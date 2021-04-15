@@ -20,13 +20,15 @@ namespace OS.API.Controllers.User
     {
         private readonly ILogger<LoginController> _Logger;
         private readonly IUserManager _UserManager;
+        private readonly IRefreshTokenManager _RefreshTokenManager;
         private readonly ITokenService _TokenService;
         private readonly IDateService _DateService;
 
-        public LoginController(ILogger<LoginController> logger, IUserManager userManager, ITokenService tokenService, IDateService dateService)
+        public LoginController(ILogger<LoginController> logger, IUserManager userManager, IRefreshTokenManager refreshTokenManager,  ITokenService tokenService, IDateService dateService)
         {
             _Logger = logger;
             _UserManager = userManager;
+            _RefreshTokenManager = refreshTokenManager;
             _TokenService = tokenService;
             _DateService = dateService;
         }
@@ -35,7 +37,7 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<AuthResponse> LoginUserAsync([FromBody] AuthModel request)
+        public async Task<ActionResult<AuthResponse>> LoginUserAsync([FromBody] AuthModel request)
         {
             var dbUser = _UserManager.GetAuthDetails(request.Username);
 

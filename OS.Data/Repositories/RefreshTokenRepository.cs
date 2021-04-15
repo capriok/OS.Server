@@ -22,10 +22,21 @@ namespace OS.Data.Repositories
 
         public RefreshTokenEntity FindByToken(string token)
         {
-            return _OSContext.RefreshTokens.AsQueryable()
+            var dbToken =  _OSContext.RefreshTokens.AsQueryable()
                 .Where(t => t.Token.Equals(token))
-                //.Where(t => t.UserId.Equals(1))
                 .FirstOrDefault();
+
+            return dbToken;
+
+        }
+
+        public RefreshTokenEntity FindByUserId(int userId)
+        {
+            var dbToken = _OSContext.RefreshTokens.AsQueryable()
+                .Where(t => t.UserId.Equals(userId))
+                .Single();
+
+            return dbToken;
         }
 
         public async Task<RefreshTokenEntity> AddAsync(RefreshTokenEntity token)

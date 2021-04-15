@@ -8,8 +8,9 @@ namespace OS.API.Services.Interfaces
 {
     public interface IRefreshTokenManager
     {
-        Task<RefreshTokenModel> GetOneAsync(string token);
+        Task<RefreshTokenModel> GetOneByTokenAsync(string token);
+        Task<RefreshTokenModel> GetOneByUserIdAsync(int userId);
         Task<RefreshTokenModel> CreateAsync(RefreshTokenModel token);
-        Task<RefreshTokenModel> UpdateAsync(RefreshTokenModel token);
+        Task<RefreshTokenModel> UpdateAsync(string oldToken, RefreshTokenModel token);
     }
 }

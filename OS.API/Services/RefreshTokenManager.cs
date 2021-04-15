@@ -21,7 +21,25 @@ namespace OS.API.Services
             _RefreshTokenRepository = refreshTokenRepository;
         }
 
-        public async Task<RefreshTokenModel> GetOneAsync(string token)
+        public async Task<RefreshTokenModel> GetOneByUserIdAsync(int userId)
+        {
+            var tokenEntity =  _RefreshTokenRepository.FindByUserId(userId);
+
+            if (tokenEntity is null)
+            {
+                return null;
+            }
+
+            var tokenModel = new RefreshTokenModel()
+            {
+                Token = tokenEntity.Token,
+                UserId = tokenEntity.UserId
+            };
+
+            return tokenModel;
+        }
+
+        public async Task<RefreshTokenModel> GetOneByTokenAsync(string token)
         {
             var tokenEntity = _RefreshTokenRepository.FindByToken(token);
 
@@ -56,9 +74,9 @@ namespace OS.API.Services
             };
         }
 
-        public async Task<RefreshTokenModel> UpdateAsync(RefreshTokenModel token)
+        public async Task<RefreshTokenModel> UpdateAsync(string oldToken, RefreshTokenModel token)
         {
-            var tokenEntity = _RefreshTokenRepository.FindByToken(token.Token);
+            var tokenEntity = _RefreshTokenRepository.FindByToken(oldToken);
 
             if (tokenEntity is null)
             {

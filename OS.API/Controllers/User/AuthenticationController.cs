@@ -54,16 +54,16 @@ namespace OS.API.Controllers.User
                 return BadRequest();
             }
 
-            var dbEntity = await _RefreshTokenManager.GetOneAsync(refreshTokenCookie);
-            
-            _Logger.LogInformation(dbEntity.Token.ToString());
-            _Logger.LogInformation(dbEntity.UserId.ToString());
+            var dbEntity = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
 
             if (dbEntity is null)
             {
                 _TokenService.RevokeAuthenticationRefreshTokens(Response);
                 return Unauthorized();
             }
+
+            _Logger.LogInformation(dbEntity.Token.ToString());
+            _Logger.LogInformation(dbEntity.UserId.ToString());
 
             if (!dbEntity.Token.Equals(refreshTokenCookie))
             {
@@ -93,7 +93,7 @@ namespace OS.API.Controllers.User
             //_TokenService.RevokeAuthenticationRefreshTokens(Response);
             //return Ok();
 
-            var dbEntity = await _RefreshTokenManager.GetOneAsync(refreshTokenCookie);
+            var dbEntity = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
 
             if (dbEntity is null)
             {

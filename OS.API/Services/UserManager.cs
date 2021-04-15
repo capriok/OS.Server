@@ -116,14 +116,7 @@ namespace OS.API.Services
 
         private string UseUpdatedValue(string currValue, string newValue)
         {
-            if (currValue is null)
-            {
-                return newValue;
-            }
-            if (!newValue.Equals(""))
-            {
-                return currValue;
-            }
+            var valueModified = !currValue.Equals(newValue);
 
             if (currValue.Equals("")  || currValue is null) return newValue;
             if (newValue.Equals("") || newValue is null) return currValue;

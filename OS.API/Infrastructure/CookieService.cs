@@ -16,7 +16,6 @@ namespace OS.API.Infrastructure
             Secure = true;
             HttpOnly = true;
             SameSite = SameSiteMode.None;
-            //SameSite = _env.IsDevelopment() ? SameSiteMode.None : SameSiteMode.Strict
         }
     }
 

@@ -32,18 +32,16 @@ namespace OS.API.Infrastructure
 
         public async Task IssueAuthenticationTokens(HttpResponse Response, UserModel user)
         {
+            var oldToken = await _RefreshTokenManager.GetOneByUserIdAsync(user.Id);
+
             var authorizationToken = GenerateAuthenticationToken(user.Username);
             _CookieService.AppendAuthenticationCookie(Response, authorizationToken);
 
-            var refreshToken = GenerateAuthenticationRefreshToken();
-            _CookieService.AppendRefreshAuthenticationCookie(Response, refreshToken);
+            var newToken = GenerateAuthenticationRefreshToken();
+            _CookieService.AppendRefreshAuthenticationCookie(Response, newToken.Token);
 
-            await _RefreshTokenManager.UpdateAsync(new RefreshTokenModel
-            {
-                Token = refreshToken
-            });
+            await _RefreshTokenManager.UpdateAsync(oldToken.Token, newToken);
         }
-
 
         public void RevokeAuthenticationRefreshTokens(HttpResponse Response)
         {
@@ -73,9 +71,12 @@ namespace OS.API.Infrastructure
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private static string GenerateAuthenticationRefreshToken()
+        private static RefreshTokenModel GenerateAuthenticationRefreshToken()
         {
-            return Guid.NewGuid().ToString();
+            return new RefreshTokenModel
+            {
+                Token = Guid.NewGuid().ToString()
+            };
         }
     }
 }
