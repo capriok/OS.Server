@@ -85,10 +85,7 @@ namespace OS.API.Controllers.User
             Request.Cookies.TryGetValue(_Config["Cookie:RefreshToken"], out var refreshTokenCookie);
 
             var dbToken = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
-
-            _Logger.LogInformation($"REVOKE, req {request.Id}");
-            _Logger.LogInformation($"REVOKE, db {dbToken.UserId}");
-
+            
             if (dbToken is null)
             {
                 return BadRequest();
