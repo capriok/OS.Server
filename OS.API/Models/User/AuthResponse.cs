@@ -7,12 +7,12 @@ namespace OS.API.Models.User
 {
     public class AuthResponse
     {
-        public AuthResponse(int id)
+        public AuthResponse(int userId)
         {
-            Id = id;
+            UserId = userId;
         }
 
-        public int Id { get; set; }
+        public int UserId { get; set; }
         public string LastLogin { get; set; }
     }
 }

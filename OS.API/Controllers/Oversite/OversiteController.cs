@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OS.API.Models.Oversite;
@@ -12,23 +12,23 @@ namespace OS.API.Controllers.Oversite
 {
 
     [ApiController]
-    [Route(Routes.Oversite.AllOversites)]
+    [Route(Routes.Oversite.OneOversite)]
     [Authorize]
-    public class OversitesController : ControllerBase
+    public class OversiteController : ControllerBase
     {
        private readonly IOversiteManager _OversiteManager;
 
-        public OversitesController(IOversiteManager oversiteManager)
+        public OversiteController(IOversiteManager oversiteManager)
         {
             _OversiteManager = oversiteManager;
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<OversiteModel>> AllOversitesAsync()
+        public async Task<ActionResult<OversiteModel>> GetOversiteAsync([FromRoute] int oversiteId)
         {
-            var dbOversite = await _OversiteManager.GetAllAsync();
+            var dbOversite = await _OversiteManager.GetEntityAsync(oversiteId);
             if (dbOversite is null)
             {
                 return NotFound();

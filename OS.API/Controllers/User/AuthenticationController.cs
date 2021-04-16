@@ -51,7 +51,7 @@ namespace OS.API.Controllers.User
                 return BadRequest();
             }
 
-            var dbEntity = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
+            var dbEntity =  _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
 
             if (dbEntity is null)
             {
@@ -80,11 +80,11 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> RevokeAuthentication([FromBody] UserModel request)
+        public ActionResult RevokeAuthentication([FromBody] UserModel request)
         {
             Request.Cookies.TryGetValue(_Config["Cookie:RefreshToken"], out var refreshTokenCookie);
 
-            var dbToken = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
+            var dbToken =  _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
             
             if (dbToken is null)
             {

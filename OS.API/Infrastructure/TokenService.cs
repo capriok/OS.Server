@@ -32,7 +32,7 @@ namespace OS.API.Infrastructure
 
         public async Task IssueAuthenticationTokens(HttpResponse Response, UserModel user)
         {
-            var oldToken = await _RefreshTokenManager.GetOneByUserIdAsync(user.Id);
+            var oldToken =  _RefreshTokenManager.GetOneByUserIdAsync(user.Id);
 
             var authorizationToken = GenerateAuthenticationToken(user.Username);
             _CookieService.AppendAuthenticationCookie(Response, authorizationToken);
