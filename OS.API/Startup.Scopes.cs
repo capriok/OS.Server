@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using OS.API.Infrastructure.Interfaces;
 using OS.API.Infrastructure;
-using OS.API.Services.Interfaces;
-using OS.API.Services;
+using OS.API.Managers.Interfaces;
+using OS.API.Managers;
 using OS.Data.Repositories.Interfaces;
 using OS.Data.Repositories;
 using System;
@@ -21,12 +21,20 @@ namespace OS.API
             Services.AddScoped<ITokenService, TokenService>();
             Services.AddScoped<ICookieService, CookieService>();
             Services.AddScoped<IDateService, DateService>();
-            Services.AddScoped<IUserManager, UserManager>();
-            Services.AddScoped<IUserRepository, UserRepository>();
-            Services.AddScoped<IOversiteManager, OversiteManager>();
-            Services.AddScoped<IOversiteRepository, OversiteRepository>();
+            
             Services.AddScoped<IRefreshTokenManager, RefreshTokenManager>();
-            Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            Services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            Services.AddScoped<IUserManager, UserManager>();
+            Services.AddTransient<IUserRepository, UserRepository>();
+            
+            Services.AddScoped<IUserDomainManager, UserDomainManager>();
+            Services.AddTransient<IUserDomainRepository, UserDomainRepository>();
+
+            Services.AddScoped<IOversiteManager, OversiteManager>();
+            Services.AddTransient<IOversiteRepository, OversiteRepository>();
+            
+            Services.AddTransient<ISightRepository, SightRepository>();
         }
     }
 }

@@ -10,8 +10,11 @@ namespace OS.Data.Entities.Interfaces
     {
         int Id { get; set; }
         string Title { get; set; }
-        string Website{ get; set; }
+        string Domain { get; set; }
+        string Description { get; set; }
         string Category{ get; set; }
+        string Severity{ get; set; }
+        bool Private{ get; set; }
         int UserId { get; set; }
     }
 }

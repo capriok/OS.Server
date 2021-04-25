@@ -20,8 +20,9 @@ namespace OS.API.Controllers
 
         public static class Oversite
         {
-            public const string AllOversites = Root + "/oversites";
             public const string OneOversite = Root + "/oversite";
+            public const string RecentlyFounded = Root + "/recent-oversites";
+            public const string SearchResult = Root + "/searchresult-oversites";
         }
     }
 }

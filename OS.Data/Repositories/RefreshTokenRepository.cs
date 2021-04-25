@@ -2,10 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OS.Data.Repositories
@@ -20,23 +17,28 @@ namespace OS.Data.Repositories
             _OSContext = osContext;
         }
 
-        public RefreshTokenEntity FindByToken(string token)
+        public IQueryable<RefreshTokenEntity> AllRefreshTokensQueryable()
         {
-            return  _OSContext.RefreshTokens.AsQueryable()
-                .Where(t => t.Token.Equals(token))
-                .FirstOrDefault();
+            return _OSContext.RefreshToken.AsQueryable();
         }
 
-        public RefreshTokenEntity FindByUserId(int userId)
+        public async Task<RefreshTokenEntity> FindByToken(string token)
         {
-            return _OSContext.RefreshTokens.AsQueryable()
-                .Where(t => t.UserId.Equals(userId))
-                .Single();
+            return await AllRefreshTokensQueryable()
+                .Where(rt => rt.Token.Equals(token))
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<RefreshTokenEntity> FindByUserId(int userId)
+        {
+            return await AllRefreshTokensQueryable()
+                .Where(rt => rt.UserId.Equals(userId))
+                .FirstOrDefaultAsync();
         }
 
         public async Task<RefreshTokenEntity> AddAsync(RefreshTokenEntity token)
         {
-            await  _OSContext.RefreshTokens.AddAsync(token);
+            await _OSContext.RefreshToken.AddAsync(token);
             await _OSContext.SaveChangesAsync();
 
             _Logger.LogInformation($"(Repository) Token Added: {token.UserId}");
@@ -46,7 +48,7 @@ namespace OS.Data.Repositories
 
         public async Task<RefreshTokenEntity> UpdateAsync(RefreshTokenEntity token)
         {
-            var local = _OSContext.RefreshTokens.Local.FirstOrDefault(entity => entity.Id == token.Id);
+            var local = _OSContext.RefreshToken.Local.FirstOrDefault(entity => entity.Id == token.Id);
             if (local is not null)
             {
                 _OSContext.Entry(local).State = EntityState.Detached;

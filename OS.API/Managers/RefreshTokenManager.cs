@@ -1,29 +1,26 @@
 ﻿using Microsoft.Extensions.Logging;
+using OS.API.Managers.Interfaces;
 using OS.API.Models.RefreshToken;
-using OS.API.Services.Interfaces;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Services
+namespace OS.API.Managers
 {
     public class RefreshTokenManager : IRefreshTokenManager
     {
         private readonly ILogger<RefreshTokenManager> _Logger;
         private readonly IRefreshTokenRepository _RefreshTokenRepository;
 
-        public RefreshTokenManager(ILogger<RefreshTokenManager> logger,IRefreshTokenRepository refreshTokenRepository)
+        public RefreshTokenManager(ILogger<RefreshTokenManager> logger, IRefreshTokenRepository refreshTokenRepository)
         {
             _Logger = logger;
             _RefreshTokenRepository = refreshTokenRepository;
         }
 
-        public RefreshTokenModel GetOneByUserIdAsync(int userId)
+        public async Task<RefreshTokenModel> GetOneByUserIdAsync(int userId)
         {
-            var tokenEntity =  _RefreshTokenRepository.FindByUserId(userId);
+            var tokenEntity = await _RefreshTokenRepository.FindByUserId(userId);
 
             if (tokenEntity is null)
             {
@@ -39,9 +36,9 @@ namespace OS.API.Services
             return tokenModel;
         }
 
-        public RefreshTokenModel GetOneByTokenAsync(string token)
+        public async Task<RefreshTokenModel> GetOneByTokenAsync(string token)
         {
-            var tokenEntity = _RefreshTokenRepository.FindByToken(token);
+            var tokenEntity = await _RefreshTokenRepository.FindByToken(token);
 
             if (tokenEntity is null)
             {
@@ -77,7 +74,7 @@ namespace OS.API.Services
 
         public async Task<RefreshTokenModel> UpdateAsync(string oldToken, RefreshTokenModel token)
         {
-            var tokenEntity = _RefreshTokenRepository.FindByToken(oldToken);
+            var tokenEntity = await _RefreshTokenRepository.FindByToken(oldToken);
 
             if (tokenEntity is null)
             {

@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace OS.Data.Entities
 {
-    public class ProofEntity : IProofEntity
+    public class SightEntity : ISightEntity
     {
         public int Id { get; set; }
-        public string Blob { get; set; }
+        public string Data { get; set; }
+        public string FileName { get; set; }
         public int OversiteId { get; set; }
     }
 }

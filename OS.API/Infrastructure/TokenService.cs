@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using OS.API.Infrastructure.Interfaces;
+using OS.API.Managers.Interfaces;
+using OS.API.Models.RefreshToken;
+using OS.API.Models.User;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using OS.API.Models.User;
-using OS.API.Infrastructure.Interfaces;
-using OS.API.Services.Interfaces;
-using System;
 using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using OS.API.Services;
-using OS.API.Models.RefreshToken;
 
 namespace OS.API.Infrastructure
 {
@@ -32,7 +29,7 @@ namespace OS.API.Infrastructure
 
         public async Task IssueAuthenticationTokens(HttpResponse Response, UserModel user)
         {
-            var oldToken =  _RefreshTokenManager.GetOneByUserIdAsync(user.Id);
+            var oldToken = await _RefreshTokenManager.GetOneByUserIdAsync(user.Id);
 
             var authorizationToken = GenerateAuthenticationToken(user.Username);
             _CookieService.AppendAuthenticationCookie(Response, authorizationToken);

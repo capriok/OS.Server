@@ -8,8 +8,9 @@ namespace OS.Data.Repositories.Interfaces
 {
     public interface IRefreshTokenRepository
     {
-        RefreshTokenEntity FindByToken(string token);
-        RefreshTokenEntity FindByUserId(int userId);
+        IQueryable<RefreshTokenEntity> AllRefreshTokensQueryable();
+        Task<RefreshTokenEntity> FindByToken(string token);
+        Task<RefreshTokenEntity> FindByUserId(int userId);
         Task<RefreshTokenEntity> AddAsync(RefreshTokenEntity token);
         Task<RefreshTokenEntity> UpdateAsync(RefreshTokenEntity token);
     }

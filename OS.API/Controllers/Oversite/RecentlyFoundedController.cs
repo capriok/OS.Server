@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OS.API.Models.Oversite;
-using OS.API.Services.Interfaces;
+using OS.API.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +10,11 @@ using System.Threading.Tasks;
 
 namespace OS.API.Controllers.Oversite
 {
-
     [ApiController]
-    [Route(Routes.Oversite.AllOversites)]
+    [Route(Routes.Oversite.RecentlyFounded)]
     public class OversitesController : ControllerBase
     {
-       private readonly IOversiteManager _OversiteManager;
+        private readonly IOversiteManager _OversiteManager;
 
         public OversitesController(IOversiteManager oversiteManager)
         {
@@ -25,11 +24,14 @@ namespace OS.API.Controllers.Oversite
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<OversiteModel>> AllOversitesAsync()
+        public async Task<ActionResult<OversiteModel>> RecentlyFoundedOversitesAsync()
         {
-            var dbOversite = await _OversiteManager.GetAllAsync();
+            // replace with logic to respond with oversites that meet a recent data req
+            // paginate results to 10 ish
 
-            return Ok(dbOversite);
+            var osList = await _OversiteManager.GetAllAsync();
+
+            return Ok(osList);
         }
     }
 }

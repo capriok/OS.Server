@@ -3,15 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OS.API.Models.User;
 using OS.API.Infrastructure.Interfaces;
-using OS.API.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OS.API.Managers.Interfaces;
+using OS.API.Models.User;
 using System.Threading.Tasks;
-using OS.API.Services;
-using OS.API.Models.RefreshToken;
 
 namespace OS.API.Controllers.User
 {
@@ -23,15 +18,17 @@ namespace OS.API.Controllers.User
         private readonly IConfiguration _Config;
         private readonly ILogger _Logger;
         private readonly IUserManager _UserManager;
+        private readonly IUserDomainManager _UserDomainManager;
         private readonly IRefreshTokenManager _RefreshTokenManager;
         private readonly ITokenService _TokenService;
         private readonly IDateService _DateService;
 
-        public AuthenticationController(IConfiguration config, ILogger<AuthenticationController> logger, IUserManager userManager, IRefreshTokenManager refreshTokenManager, ITokenService tokenService, IDateService dateService)
+        public AuthenticationController(IConfiguration config, ILogger<AuthenticationController> logger, IUserManager userManager, IUserDomainManager userDomainManager, IRefreshTokenManager refreshTokenManager, ITokenService tokenService, IDateService dateService)
         {
             _Config = config;
             _Logger = logger;
             _UserManager = userManager;
+            _UserDomainManager = userDomainManager;
             _RefreshTokenManager = refreshTokenManager;
             _TokenService = tokenService;
             _DateService = dateService;
@@ -51,11 +48,11 @@ namespace OS.API.Controllers.User
                 return BadRequest();
             }
 
-            var dbEntity =  _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
+            var dbEntity = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
 
             if (dbEntity is null)
             {
-                _TokenService.RevokeAuthenticationRefreshTokens(Response, refreshTokenCookie);
+                await _TokenService.RevokeAuthenticationRefreshTokens(Response, refreshTokenCookie);
                 return Unauthorized();
             }
 
@@ -70,22 +67,28 @@ namespace OS.API.Controllers.User
 
             _Logger.LogInformation($"(Token) Refreshed User Authentication: {dbEntity.UserId}");
 
-            return Ok(new AuthResponse(authedUser.Id)
+            var userDomains = await _UserDomainManager.GetAllByUserId(authedUser.Id);
+
+            var response = new AuthResponse(authedUser.Id)
             {
-                LastLogin = _DateService.LastLogin()
-            });
+                Username = authedUser.Username,
+                LastLogin = _DateService.LastLogin(),
+                Domains = userDomains
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult RevokeAuthentication([FromBody] UserModel request)
+        public async Task<ActionResult> RevokeAuthentication([FromBody] UserModel request)
         {
             Request.Cookies.TryGetValue(_Config["Cookie:RefreshToken"], out var refreshTokenCookie);
 
-            var dbToken =  _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
-            
+            var dbToken = await _RefreshTokenManager.GetOneByTokenAsync(refreshTokenCookie);
+
             if (dbToken is null)
             {
                 return BadRequest();
@@ -96,7 +99,7 @@ namespace OS.API.Controllers.User
                 return Conflict();
             }
 
-            _TokenService.RevokeAuthenticationRefreshTokens(Response, refreshTokenCookie);
+            await _TokenService.RevokeAuthenticationRefreshTokens(Response, refreshTokenCookie);
 
             _Logger.LogInformation($"(Token) Revoked User Authentication: {dbToken.UserId}");
 

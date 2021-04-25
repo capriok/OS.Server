@@ -53,8 +53,6 @@ namespace OS.API
 
             app.UseHttpsRedirection();
 
-            app.UseSerilogRequestLogging();
-
             app.UseRouting();
 
             app.UseAuthentication();

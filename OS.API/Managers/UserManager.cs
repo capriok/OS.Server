@@ -1,45 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OS.API.Infrastructure.Interfaces;
+using OS.API.Managers.Interfaces;
 using OS.API.Models.User;
-using OS.API.Services.Interfaces;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Services
+namespace OS.API.Managers
 {
     public class UserManager : IUserManager
     {
         private readonly ILogger<UserManager> _Logger;
         private readonly IUserRepository _UserRepository;
+        private readonly IUserDomainManager _UserDomainManager;
         private readonly IDateService _DateService;
 
-        public UserManager(ILogger<UserManager> logger, IUserRepository userRepository, IDateService dateService)
+        public UserManager(ILogger<UserManager> logger, IUserRepository userRepository, IUserDomainManager userDomainManager, IDateService dateService)
         {
             _Logger = logger;
             _UserRepository = userRepository;
+            _UserDomainManager = userDomainManager;
             _DateService = dateService;
         }
 
-        public async Task<List<UserModel>> GetAllAsync()
+        public async Task<AuthModel> GetAuthDetails(string Username)
         {
-            IQueryable<UserEntity> query = _UserRepository.GetQueryable();
-
-            return await query.Select(user => new UserModel(user.Id)
-            {
-                Username = user.Username,
-                JoinDate = user.JoinDate
-            })
-            .ToListAsync();
-        }
-
-        public AuthModel GetAuthDetails(string Username)
-        {
-            var userEntity = _UserRepository.FindByUsername(Username);
+            var userEntity = await _UserRepository.FindByUsername(Username);
 
             if (userEntity is null)
             {
@@ -62,10 +49,13 @@ namespace OS.API.Services
                 return null;
             }
 
+            var userDomains = await _UserDomainManager.GetAllByUserId(userId);
+
             return new UserModel(userEntity.Id)
             {
                 Username = userEntity.Username,
-                JoinDate = userEntity.JoinDate
+                JoinDate = userEntity.JoinDate,
+                Domains = userDomains
             };
         }
 
@@ -118,13 +108,14 @@ namespace OS.API.Services
         {
             var valueModified = !currValue.Equals(newValue);
 
-            if (currValue.Equals("")  || currValue is null) return newValue;
+            if (currValue.Equals("") || currValue is null) return newValue;
             if (newValue.Equals("") || newValue is null) return currValue;
 
             if (valueModified)
             {
                 return currValue;
-            } else
+            }
+            else
             {
                 return newValue;
             }

@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OS.API.Managers.Interfaces;
 using OS.API.Models.User;
-using OS.API.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OS.API.Controllers.User
@@ -47,7 +44,7 @@ namespace OS.API.Controllers.User
                 return BadRequest();
             }
 
-            var dbUbserAuth = _UserManager.GetAuthDetails(dbUser.Username);
+            var dbUbserAuth = await _UserManager.GetAuthDetails(dbUser.Username);
             if (dbUbserAuth is null)
             {
                 return NotFound();

@@ -8,8 +8,8 @@ namespace OS.Data.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        IQueryable<UserEntity> GetQueryable();
-        UserEntity FindByUsername(string Username);
+        IQueryable<UserEntity> AllUsersQueryable();
+        Task<UserEntity> FindByUsername(string Username);
         Task<UserEntity> FindByIdAsync(int id);
         Task<UserEntity> AddAsync(UserEntity user);
         Task<UserEntity> UpdateAsync(UserEntity user);

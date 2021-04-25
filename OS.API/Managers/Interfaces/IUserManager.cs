@@ -5,12 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Services.Interfaces
+namespace OS.API.Managers.Interfaces
 {
     public interface IUserManager
     {
-        Task<List<UserModel>> GetAllAsync();
-        AuthModel GetAuthDetails(string Username);
+        Task<AuthModel> GetAuthDetails(string Username);
         Task<UserModel> GetModelAsync(int id);
         Task<UserModel> CreateAsync(AuthModel user);
         Task<UserModel> UpdateAsync(UpdateModel user);

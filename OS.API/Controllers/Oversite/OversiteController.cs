@@ -1,39 +1,41 @@
-﻿ using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using OS.API.Managers.Interfaces;
 using OS.API.Models.Oversite;
-using OS.API.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace OS.API.Controllers.Oversite
 {
-
     [ApiController]
     [Route(Routes.Oversite.OneOversite)]
-    [Authorize]
-    public class OversiteController : ControllerBase
+    public class OversiteController : Controller
     {
-       private readonly IOversiteManager _OversiteManager;
+        private readonly ILogger<OversiteController> _Logger;
+        private readonly IOversiteManager _OversiteManager;
 
-        public OversiteController(IOversiteManager oversiteManager)
+        public OversiteController(ILogger<OversiteController> logger, IOversiteManager oversiteManager)
         {
+            _Logger = logger;
             _OversiteManager = oversiteManager;
         }
 
-        [HttpGet("{id}")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<OversiteModel>> GetOversiteAsync([FromRoute] int oversiteId)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
+        public async Task<ActionResult> PostOversiteAsync([FromForm] OversiteFormData formData)
         {
-            var dbOversite = await _OversiteManager.GetEntityAsync(oversiteId);
-            if (dbOversite is null)
+            if (!Request.HasFormContentType)
             {
-                return NotFound();
+                return BadRequest();
             }
-            return Ok(dbOversite);
+
+            var createdOversite = await _OversiteManager.CreateAsync(formData);
+
+            return Ok(new OversiteModel { Id = createdOversite.Id});
         }
     }
 }

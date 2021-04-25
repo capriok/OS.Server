@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OS.API.Services.Interfaces
+namespace OS.API.Managers.Interfaces
 {
     public interface IRefreshTokenManager
     {
-        RefreshTokenModel GetOneByTokenAsync(string token);
-        RefreshTokenModel GetOneByUserIdAsync(int userId);
+        Task<RefreshTokenModel> GetOneByTokenAsync(string token);
+        Task<RefreshTokenModel> GetOneByUserIdAsync(int userId);
         Task<RefreshTokenModel> CreateAsync(RefreshTokenModel token);
         Task<RefreshTokenModel> UpdateAsync(string oldToken, RefreshTokenModel token);
     }

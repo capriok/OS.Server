@@ -2,13 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OS.API.Managers.Interfaces;
 using OS.API.Models.RefreshToken;
 using OS.API.Models.User;
-using OS.API.Services;
-using OS.API.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OS.API.Controllers.User
@@ -34,7 +31,7 @@ namespace OS.API.Controllers.User
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<AuthResponse>> RegisterUserAsync([FromBody] AuthModel request)
         {
-            var dbUser = _UserManager.GetAuthDetails(request.Username);
+            var dbUser = await _UserManager.GetAuthDetails(request.Username);
             if (dbUser is not null)
             {
                 return Conflict();
