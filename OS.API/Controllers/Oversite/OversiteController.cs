@@ -22,6 +22,21 @@ namespace OS.API.Controllers.Oversite
             _OversiteManager = oversiteManager;
         }
 
+        [HttpGet("{oversiteId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetOneOversiteAsync([FromRoute] int oversiteId)
+        {
+            var dbOversite = await _OversiteManager.GetModelAsync(oversiteId);
+
+            if (dbOversite is null)
+            {
+                NotFound();
+            }
+
+            return Ok(dbOversite);
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -35,7 +50,7 @@ namespace OS.API.Controllers.Oversite
 
             var createdOversite = await _OversiteManager.CreateAsync(formData);
 
-            return Ok(new OversiteModel { Id = createdOversite.Id});
+            return Ok(new OversiteModel { Id = createdOversite.Id });
         }
     }
 }

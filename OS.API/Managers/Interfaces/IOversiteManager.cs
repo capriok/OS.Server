@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using OS.API.Models.Oversite;
-using OS.Data.Entities;
+﻿using OS.API.Models.Oversite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +8,8 @@ namespace OS.API.Managers.Interfaces
 {
     public interface IOversiteManager
     {
-        Task<List<OversiteModel>> GetAllAsync();
-        Task<OversiteModel> GetEntityAsync(int id);
+        Task<List<OversiteModel>> GetRecentAsync();
+        Task<OversiteModel> GetModelAsync(int oversiteId);
         Task<List<OversiteModel>> GetBySearchResultAsync(string searchResult);
         Task<OversiteModel> CreateAsync(OversiteFormData formData);
     }

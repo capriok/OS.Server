@@ -34,6 +34,7 @@ namespace OS.API
             Services.AddScoped<IOversiteManager, OversiteManager>();
             Services.AddTransient<IOversiteRepository, OversiteRepository>();
             
+            Services.AddScoped<ISightManager, SightManager>();
             Services.AddTransient<ISightRepository, SightRepository>();
         }
     }

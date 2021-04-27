@@ -3,6 +3,7 @@ using OS.API.Managers.Interfaces;
 using OS.API.Models.RefreshToken;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace OS.API.Managers
@@ -27,13 +28,7 @@ namespace OS.API.Managers
                 return null;
             }
 
-            var tokenModel = new RefreshTokenModel()
-            {
-                Token = tokenEntity.Token,
-                UserId = tokenEntity.UserId
-            };
-
-            return tokenModel;
+            return ConvertEntityToModel(tokenEntity);
         }
 
         public async Task<RefreshTokenModel> GetOneByTokenAsync(string token)
@@ -45,15 +40,8 @@ namespace OS.API.Managers
                 return null;
             }
 
-            var tokenModel = new RefreshTokenModel()
-            {
-                Token = tokenEntity.Token,
-                UserId = tokenEntity.UserId
-            };
-
-            return tokenModel;
+            return ConvertEntityToModel(tokenEntity);
         }
-
 
         public async Task<RefreshTokenModel> CreateAsync(RefreshTokenModel token)
         {
@@ -65,11 +53,7 @@ namespace OS.API.Managers
 
             var createdToken = await _RefreshTokenRepository.AddAsync(tokenEntity);
 
-            return new RefreshTokenModel
-            {
-                Token = createdToken.Token,
-                UserId = createdToken.UserId
-            };
+            return ConvertEntityToModel(createdToken);
         }
 
         public async Task<RefreshTokenModel> UpdateAsync(string oldToken, RefreshTokenModel token)
@@ -87,10 +71,16 @@ namespace OS.API.Managers
 
             var updatedToken = await _RefreshTokenRepository.UpdateAsync(tokenEntity);
 
+            return ConvertEntityToModel(updatedToken);
+        }
+
+        private Converter<RefreshTokenEntity, RefreshTokenModel> converter = ConvertEntityToModel;
+        private static RefreshTokenModel ConvertEntityToModel(RefreshTokenEntity t)
+        {
             return new RefreshTokenModel
             {
-                Token = updatedToken.Token,
-                UserId = updatedToken.UserId
+                Token = t.Token,
+                UserId = t.UserId
             };
         }
     }

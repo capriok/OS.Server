@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OS.Data.Repositories
@@ -25,9 +24,11 @@ namespace OS.Data.Repositories
             return _OSContext.Sight.AsQueryable();
         }
 
-        public async Task<SightEntity> GetSightByUserId(int userId)
+        public async Task<List<SightEntity>> GetOversitesSights(int oversiteId)
         {
-            throw new NotImplementedException();
+            return await AllOversitesQueryable()
+                .Where(s => s.OversiteId.Equals(oversiteId))
+                .ToListAsync();
         }
 
         public async Task<SightEntity> AddSightAsync(SightEntity sight)
@@ -35,9 +36,22 @@ namespace OS.Data.Repositories
             await _OSContext.Sight.AddAsync(sight);
             await _OSContext.SaveChangesAsync();
 
-            _Logger.LogInformation($"(Repository) Sight Added For: {sight.OversiteId}");
+            _Logger.LogInformation("(Repository) Sight Added For: {1}", sight.OversiteId);
 
             return sight;
+        }
+
+        public async Task<List<SightEntity>> AddSightRangeAsync(List<SightEntity> sights)
+        {
+            await _OSContext.Sight.AddRangeAsync(sights);
+            await _OSContext.SaveChangesAsync();
+
+            foreach (var sight in sights)
+            {
+                _Logger.LogInformation("(Repository) Sight Added For: {1}", sight.OversiteId);
+            }
+
+            return sights;
         }
     }
 }

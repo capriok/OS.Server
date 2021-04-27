@@ -13,8 +13,9 @@ namespace OS.API.Models.Oversite
         public string Description { get; set; }
         public string Category { get; set; }
         public string Severity { get; set; }
-        public SightModel[] Sights { get; set; }
         public bool Private{ get; set; }
+        public List<SightModel> Sights { get; set; }
+        public string Founder { get; set; }
         public int UserId { get; set; }
     }
 }

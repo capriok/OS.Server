@@ -1,6 +1,8 @@
 ﻿using OS.API.Managers.Interfaces;
 using OS.API.Models.User;
+using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,15 +28,26 @@ namespace OS.API.Managers
                 return userDomains;
             }
 
-            foreach (var domain in dbUserdomains)
+            return ConvertAllToModels(dbUserdomains);
+        }
+
+        private Converter<UserDomainEntity, UserDomainModel> converter = ConvertEntityToModel;
+        private List<UserDomainModel> ConvertAllToModels(List<UserDomainEntity> sightList)
+        {
+            return sightList.ConvertAll(converter);
+        }
+        private static UserDomainModel ConvertEntityToModel(UserDomainEntity d)
+        {
+            if (d is null)
             {
-                userDomains.Add(new UserDomainModel(domain.Id)
-                {
-                    Domain = domain.Domain,
-                    UserId = domain.UserId
-                });
+                return null;
             }
-            return userDomains;
+
+            return new UserDomainModel(d.Id)
+            {
+                Domain = d.Domain,
+                UserId = d.UserId
+            };
         }
     }
 }

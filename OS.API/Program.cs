@@ -29,10 +29,6 @@ namespace OS.API
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseSerilog()
-            .ConfigureLogging((context, logging) =>
-            {
-                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-            })
                 .ConfigureWebHostDefaults(
                     webBuilder => webBuilder.UseStartup<Startup>());
     }

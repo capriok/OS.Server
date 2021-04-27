@@ -10,7 +10,8 @@ namespace OS.Data.Repositories.Interfaces
     public interface ISightRepository
     {
         IQueryable<SightEntity> AllOversitesQueryable();
-        Task<SightEntity> GetSightByUserId(int userId);
+        Task<List<SightEntity>> GetOversitesSights(int oversiteId);
         Task<SightEntity> AddSightAsync(SightEntity sight);
+        Task<List<SightEntity>> AddSightRangeAsync(List<SightEntity> sights);
     }
 }

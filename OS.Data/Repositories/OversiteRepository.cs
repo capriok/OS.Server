@@ -22,6 +22,13 @@ namespace OS.Data.Repositories
         {
             return _OSContext.Oversite.AsQueryable();
         }
+        public async Task<List<OversiteEntity>> FindTenRecent()
+        {
+            return await AllOversitesQueryable()
+                .Select(os => os)
+                .Take(10)
+                .ToListAsync();
+        }
 
         public async Task<List<OversiteEntity>> FindBySearchResult(string searchResult)
         {
@@ -40,7 +47,7 @@ namespace OS.Data.Repositories
             await _OSContext.Oversite.AddAsync(oversite);
             await _OSContext.SaveChangesAsync();
 
-            _Logger.LogInformation($"(Repository) Oversite Added: {oversite.Id}");
+            _Logger.LogInformation("(Repository) Oversite Added: {1}", oversite.Id);
 
             return oversite;
         }

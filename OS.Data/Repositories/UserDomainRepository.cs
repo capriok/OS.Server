@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OS.Data.Entities;
 using OS.Data.Repositories.Interfaces;
 using System.Collections.Generic;
@@ -9,10 +10,12 @@ namespace OS.Data.Repositories
 {
     public class UserDomainRepository : IUserDomainRepository
     {
+        private readonly ILogger<UserDomainRepository> _Logger;
         private readonly OSContext _OSContext;
 
-        public UserDomainRepository(OSContext osContext)
+        public UserDomainRepository(ILogger<UserDomainRepository> logger, OSContext osContext)
         {
+            _Logger = logger;
             _OSContext = osContext;
         }
 

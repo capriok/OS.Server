@@ -9,7 +9,7 @@ namespace OS.Data.Entities
     public class SightEntity : ISightEntity
     {
         public int Id { get; set; }
-        public string Data { get; set; }
+        public byte[] Data { get; set; }
         public string FileName { get; set; }
         public int OversiteId { get; set; }
     }

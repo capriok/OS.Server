@@ -29,7 +29,7 @@ namespace OS.API.Controllers.Oversite
             // replace with logic to respond with oversites that meet a recent data req
             // paginate results to 10 ish
 
-            var osList = await _OversiteManager.GetAllAsync();
+            var osList = await _OversiteManager.GetRecentAsync();
 
             return Ok(osList);
         }

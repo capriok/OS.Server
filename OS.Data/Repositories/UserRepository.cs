@@ -40,7 +40,7 @@ namespace OS.Data.Repositories
             await _OSContext.User.AddAsync(user);
             await _OSContext.SaveChangesAsync();
 
-            _Logger.LogInformation($"(Repository) User Added: {user.Username}");
+            _Logger.LogInformation("(Repository) User Added: {1}", user.Username);
 
             return user;
         }
@@ -56,7 +56,7 @@ namespace OS.Data.Repositories
             _OSContext.Entry(user).State = EntityState.Modified;
             await _OSContext.SaveChangesAsync();
 
-            _Logger.LogInformation($"(Repository) User Updated: {user.Id}");
+            _Logger.LogInformation("(Repository) User Updated: {1}", user.Id);
 
             return user;
         }
@@ -69,7 +69,7 @@ namespace OS.Data.Repositories
                 _OSContext.User.Remove(user);
                 await _OSContext.SaveChangesAsync();
             }
-            _Logger.LogInformation($"(Repository) User Removed: {userId}");
+            _Logger.LogInformation("(Repository) User Removed: {1}", userId);
         }
     }
 }

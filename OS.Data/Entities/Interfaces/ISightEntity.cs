@@ -8,7 +8,7 @@ namespace OS.Data.Entities.Interfaces
     public interface ISightEntity
     {
         int Id { get; set; }
-        string Data { get; set; }
+        byte[] Data { get; set; }
         int OversiteId { get; set; }
     }
 }

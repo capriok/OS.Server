@@ -25,10 +25,12 @@ namespace OS.API.Controllers.User
         public async Task<ActionResult<UserModel>> GetUserAsync([FromRoute] int userId)
         {
             var dbUser = await _UserManager.GetModelAsync(userId);
+
             if (dbUser is null)
             {
                 return NotFound();
             }
+
             return Ok(dbUser);
         }
 
@@ -39,12 +41,14 @@ namespace OS.API.Controllers.User
         public async Task<IActionResult> UpdateUserAsync([FromRoute] int userId, [FromBody] UpdateModel user)
         {
             var dbUser = await _UserManager.GetModelAsync(userId);
+
             if (userId != dbUser.Id)
             {
                 return BadRequest();
             }
 
             var dbUbserAuth = await _UserManager.GetAuthDetails(dbUser.Username);
+
             if (dbUbserAuth is null)
             {
                 return NotFound();

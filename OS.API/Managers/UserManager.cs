@@ -70,11 +70,7 @@ namespace OS.API.Managers
 
             var createdEntity = await _UserRepository.AddAsync(userEntity);
 
-            return new UserModel(createdEntity.Id)
-            {
-                Username = createdEntity.Username,
-                JoinDate = createdEntity.JoinDate
-            };
+            return ConvertEntityToModel(createdEntity);
         }
 
         public async Task<UserModel> UpdateAsync(UpdateModel updateModel)
@@ -92,11 +88,7 @@ namespace OS.API.Managers
 
             var updatedEntity = await _UserRepository.UpdateAsync(userEntity);
 
-            return new UserModel(updatedEntity.Id)
-            {
-                Username = updatedEntity.Username,
-                JoinDate = updatedEntity.JoinDate
-            };
+            return ConvertEntityToModel(updatedEntity);
         }
 
         public async Task DeleteAsync(int userId)
@@ -119,6 +111,21 @@ namespace OS.API.Managers
             {
                 return newValue;
             }
+        }
+
+        private Converter<UserEntity, UserModel> converter = ConvertEntityToModel;
+        private static UserModel ConvertEntityToModel(UserEntity u)
+        {
+            if (u is null)
+            {
+                return null;
+            }
+
+            return new UserModel (u.Id) 
+            {
+                Username = u.Username,
+                JoinDate = u.JoinDate
+            };
         }
     }
 }

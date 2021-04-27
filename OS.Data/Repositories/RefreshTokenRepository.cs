@@ -41,7 +41,7 @@ namespace OS.Data.Repositories
             await _OSContext.RefreshToken.AddAsync(token);
             await _OSContext.SaveChangesAsync();
 
-            _Logger.LogInformation($"(Repository) Token Added: {token.UserId}");
+            _Logger.LogInformation("(Repository) Token Added: {1}", token.UserId);
 
             return token;
         }
@@ -57,7 +57,7 @@ namespace OS.Data.Repositories
             _OSContext.Entry(token).State = EntityState.Modified;
             await _OSContext.SaveChangesAsync();
 
-            _Logger.LogInformation($"(Repository) Token Updated: {token.UserId}");
+            _Logger.LogInformation("(Repository) Token Updated: {1}", token.UserId);
 
             return token;
         }
