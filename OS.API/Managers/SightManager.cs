@@ -90,8 +90,9 @@ namespace OS.API.Managers
                 }
 
                 var created = await _SightRepository.AddSightRangeAsync(sightList);
-                totalAdded = totalAdded + created.Count;
                 createdSights.AddRange(created);
+
+                totalAdded = totalAdded + created.Count;
             }
 
             return ConvertAllToModels(createdSights);
